@@ -24,13 +24,19 @@ int main (void)
                                         LoadImage("characters/Robo_Gladiador_EAST.png"), 
                                         3, 3, 50, 50);
 
+    
+
     int stage_sequence = 0; // 0 = Primeiro estágio; 1 = Transição_Primeiro_e_Boss; 2 = Boss;
     double time = 0;
     Vector2 middle_circle;
     Color blue = {0, 100, 255, 255};
     Texture2D textura_atual_player; // Variável para guardar a textura a ser desenhada do player
+    Image bala_image = LoadImage("characters/wabbit_alpha.png");
+    int cooldown = 60; // Variável para controlar o cooldown do tiro
+    int timer = 0; // Timer para controlar os movimentos do boss
     while (WindowShouldClose() == false)
     {
+        cooldown++;
         //TEMPO
         if (time < 120 && stage_sequence == 0)
         {
@@ -39,7 +45,14 @@ int main (void)
 
         //EVENT HANDLING
         mover_player(personagens[0]);
-        if (time >= 120 && stage_sequence == 0)
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && cooldown >= 60)
+        {
+            cooldown = 0; // Reseta o cooldown
+            atirar(&personagens[0][0], bala_image);
+        }
+       
+
+        if (time >= 10 && stage_sequence == 0)
         {
             stage_sequence = 1;
             middle_circle.x =(GetScreenWidth() / 2.0f);
@@ -48,6 +61,15 @@ int main (void)
         if (stage_sequence == 1 && CheckCollisionCircleRec(middle_circle, 30, personagens[0][0].hitbox))
         {
             //Lembrar de limpar todos os inimigos da tela
+            if (timer == 0) { //cria o boss
+                personagens[4][0] = criar_boss('S', (GetScreenWidth() / 2), (GetScreenHeight() / 2) + 70,
+                                        LoadImage("characters/Robo_Gladiador_NORTH.png"),
+                                        LoadImage("characters/Robo_Gladiador_SOUTH.png"),
+                                        LoadImage("characters/Robo_Gladiador_WEST.png"),
+                                        LoadImage("characters/Robo_Gladiador_EAST.png"));
+            }
+            timer++;    
+            movimentacao_boss(&personagens[4][0], &personagens[0][0], bala_image, &timer);
             stage_sequence = 2;
             UnloadTexture(background); // Descarrega o background antigo
             background = criar_background("background/Sala_Boss.png");
@@ -75,23 +97,23 @@ int main (void)
         BeginDrawing();
         ClearBackground(WHITE);
         DrawTexture(background, 0, 0, WHITE);
-        
         switch (stage_sequence)
         {
             case 0:
-                DrawText(TextFormat("%d : %02d", ((int)time) / 60, ((int)time) % 60), 10, 10, 50, WHITE);
-                DrawText("MISSÃO: SOBREVIVER POR 2 MINUTOS!", 10, GetScreenHeight() - 50, 30, WHITE);
-                break;
+            DrawText(TextFormat("%d : %02d", ((int)time) / 60, ((int)time) % 60), 10, 10, 50, WHITE);
+            DrawText("MISSÃO: SOBREVIVER POR 2 MINUTOS!", 10, GetScreenHeight() - 50, 30, WHITE);
+            break;
             case 1:
-                DrawCircleV(middle_circle, 30, blue);
-                DrawText("MISSÃO: ENTRE NO PORTAL PARA ENFRENTAR O BOSS!", 10, GetScreenHeight() - 50, 30, WHITE);
-                break;
+            DrawCircleV(middle_circle, 30, blue);
+            DrawText("MISSÃO: ENTRE NO PORTAL PARA ENFRENTAR O BOSS!", 10, GetScreenHeight() - 50, 30, WHITE);
+            break;
             case 2:
-                DrawText("MISSÃO: DERROTE O BOSS!", 10, GetScreenHeight() - 50, 30, WHITE);
-                break;
+            DrawText("MISSÃO: DERROTE O BOSS!", 10, GetScreenHeight() - 50, 30, WHITE);
+            break;
         }
         
         DrawTextureV(textura_atual_player, (Vector2){personagens[0][0].hitbox.x, personagens[0][0].hitbox.y}, WHITE);
+        mover_balas(personagens);
         
         EndDrawing();
     }
@@ -99,6 +121,7 @@ int main (void)
     // LIMPEZA FINAL (é bom fazer uma função disso no futuro)
     destruir_personagem(personagens[0][0]);
     UnloadTexture(background);
+    UnloadImage(bala_image);
     free(personagens[0]);
     free(personagens);
     CloseWindow();

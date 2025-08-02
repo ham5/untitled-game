@@ -1,4 +1,5 @@
 #include "funcoe_utilizadas.h" // Inclui o cabeçalho com as declarações
+#include <math.h>
 
 //Cria um personagem e atribui suas caracteristicas
 Personagens criar_personagem(char sentido, float posicao_x, float posicao_y, Image imagem_N, Image imagem_S, Image imagem_W, Image imagem_E, int HP, int speed, int tamanho, int largura)
@@ -24,9 +25,57 @@ Personagens criar_personagem(char sentido, float posicao_x, float posicao_y, Ima
     UnloadImage(imagem_W);
     UnloadImage(imagem_E);
 
+    novo_personagem.balas = NULL;
+    novo_personagem.qtd_balas = 0;
+
     return novo_personagem;
 }
 
+Personagens criar_boss(char sentido, float posicao_x, float posicao_y, Image imagem_N, Image imagem_S, Image imagem_W, Image imagem_E)
+{
+    Personagens BOSS = criar_personagem(sentido, posicao_x, posicao_y, imagem_N, imagem_S, imagem_W, imagem_E, 20, 0, 128, 128);
+
+    return BOSS;
+}
+
+void movimentacao_boss(Personagens* boss, Personagens* player, Image bala_imagem, int *timer)
+{
+    // Lógica simples de movimentação do boss em direção ao player
+    if (boss->HP == 10) {
+        boss->speed = 1;
+
+        if (*timer < 180) {
+            if (*timer % 20 == 0) { 
+                atirar_dir_player(boss, player, bala_imagem);
+            }
+        }    
+        else {
+            *timer = 1; // Reseta o timer após 180 frames (1 para evitar q o outro boss spawne)
+            //atira para todos os lados
+            for (int i = 0; i < 360; i += 15) {
+                float dir_x = cosf(i * (PI / 180.0f));
+                float dir_y = sinf(i * (PI / 180.0f));
+                atirar_boss(boss, bala_imagem, dir_x, dir_y);
+            }
+        }    
+    }
+    if (player->hitbox.x > boss->hitbox.x + boss->hitbox.width / 2) {
+        boss->hitbox.x += boss->speed;
+        boss->sentido = 'E';
+    } else if (player->hitbox.x < boss->hitbox.x + boss->hitbox.width / 2) {
+        boss->hitbox.x -= boss->speed;
+        boss->sentido = 'W';
+    }
+
+    if (player->hitbox.y > boss->hitbox.y + boss->hitbox.height / 2) {
+        boss->hitbox.y += boss->speed;
+        boss->sentido = 'S';
+    } else if (player->hitbox.y < boss->hitbox.y + boss->hitbox.height / 2) {
+        boss->hitbox.y -= boss->speed;
+        boss->sentido = 'N';
+    }
+
+}
 //Cria o background da tela
 Texture2D criar_background(const char* caminho_imagem)
 {
@@ -51,18 +100,23 @@ Personagens** inicializar()
     int tamanho = 900;
     InitWindow(tamanho, tamanho, "COLISEU_GAME");
     SetTargetFPS(60);
-    Personagens** personagens = NULL;
-    personagens = (Personagens**) malloc(sizeof(Personagens*));
+
+    // Aloca espaço para 5 tipos de personagens
+    Personagens** personagens = (Personagens**) malloc(5 * sizeof(Personagens*));
     if (personagens == NULL)
     {
         CloseWindow();
     }
-    personagens[0] = NULL;
-    personagens[0] = (Personagens*) malloc(sizeof(Personagens));
-    if (personagens[0] == NULL)
-    {
-        free(personagens);
-        CloseWindow();
+    for (int i = 0; i < 5; i++) {
+        personagens[i] = NULL;
+        // Aloca espaço para 1 personagem em cada tipo 
+        personagens[i] = (Personagens*) malloc(sizeof(Personagens));
+        if (personagens[i] == NULL)
+        {
+            for (int j = 0; j < i; j++) free(personagens[j]);
+            free(personagens);
+            CloseWindow();
+        }
     }
     return personagens;
 }
@@ -105,5 +159,145 @@ void mover_player(Personagens* player)
             player->hitbox.x = GetScreenWidth() - 83 - player->hitbox.width;
         }
         player->sentido = 'E';
+    }
+}
+
+void atirar_boss(Personagens *boss, Image sprite, float dir_x, float dir_y) {
+    // Lógica de tiro do boss (pode ser diferente do
+    Bullet* temp = (Bullet*) realloc(boss->balas, (boss->qtd_balas + 1) * sizeof(Bullet));
+
+    if (temp == NULL) {
+        //erro de alocação
+        // ADCIONAR FUNÇÃO DE DESALOCAR TODAS AS MEMÓRIAS!!!
+        CloseWindow();
+    }
+
+    int index = boss->qtd_balas;
+
+    boss->balas = temp;
+    boss->balas[index].hitbox_bala.x = boss->hitbox.x + boss->hitbox.width / 2;
+    boss->balas[index].hitbox_bala.y = boss->hitbox.y + boss->hitbox.height / 2;
+
+    // Direção da bala 
+    boss->balas[index].direcao.x = dir_x;
+    boss->balas[index].direcao.y = dir_y;
+
+    boss->balas[index].sprite_bala = LoadTextureFromImage(sprite);
+
+    boss->qtd_balas++;
+}
+void atirar(Personagens *player, Image sprite) {
+    
+    Bullet* temp = (Bullet*) realloc(player->balas, (player->qtd_balas + 1) * sizeof(Bullet));
+
+    if (temp == NULL) {
+        //erro de alocação
+        // ADCIONAR FUNÇÃO DE DESALOCAR TODAS AS MEMÓRIAS!!!
+        CloseWindow();
+    }
+
+    player->balas = temp;
+    int index = player->qtd_balas;
+
+    player->balas[index].hitbox_bala.x = player->hitbox.x;
+    player->balas[index].hitbox_bala.y = player->hitbox.y;
+
+    int x_mouse = GetMouseX();
+    int y_mouse = GetMouseY();
+
+    if (x_mouse == player->hitbox.x && y_mouse == player->hitbox.x) { // só para evitar divisão por zero
+        x_mouse = 0;
+        y_mouse = 0;
+    }
+
+    //cálculo da direção da bala
+    int j = x_mouse - player->hitbox.x;
+    int k = y_mouse - player->hitbox.y;
+
+    player->balas[index].direcao.x = (j / sqrt(pow(j, 2) + pow(k, 2)));
+    player->balas[index].direcao.y = (k / sqrt(pow(j, 2) + pow(k, 2)));
+
+    player->balas[index].sprite_bala = LoadTextureFromImage(sprite);
+
+    (player->qtd_balas)++;
+}
+
+void atirar_dir_player(Personagens *entidade, Personagens *player, Image sprite) {
+    // Lógica de tiro do player (pode ser diferente do boss)
+    Bullet* temp = (Bullet*) realloc(entidade->balas, (entidade->qtd_balas + 1) * sizeof(Bullet));
+
+    if (temp == NULL) {
+        //erro de alocação
+        // ADCIONAR FUNÇÃO DE DESALOCAR TODAS AS MEMÓRIAS!!!
+        CloseWindow();
+    }
+
+    int index = entidade->qtd_balas;
+    entidade->balas = temp;
+
+    entidade->balas[index].hitbox_bala.x = entidade->hitbox.x + entidade->hitbox.width / 2;
+    entidade->balas[index].hitbox_bala.y = entidade->hitbox.y + entidade->hitbox.height / 2;
+
+    // Direção da bala (exemplo: atirar para o norte)
+    int j = player->hitbox.x - entidade->hitbox.x;
+    int k = player->hitbox.y - entidade->hitbox.y;
+
+    if (j == 0 && k == 0) { // só para evitar divisão por zero
+        j = 1;
+        k = 1;
+    }
+
+    entidade->balas[index].sprite_bala = LoadTextureFromImage(sprite);
+    entidade->balas[index].direcao.x = (j / sqrt(pow(j, 2) + pow(k, 2)));
+    entidade->balas[index].direcao.y = (k / sqrt(pow(j, 2) + pow(k, 2)));
+
+    entidade->qtd_balas++;
+}
+void mover_balas(Personagens **entidades) {
+    //atualiza a posição das balas (por enquanto só do player)
+    for (int i = 0; i < entidades[0][0].qtd_balas; i++) {
+        entidades[0][0].balas[i].hitbox_bala.x += (entidades[0][0].balas[i].direcao.x) * 10;
+        entidades[0][0].balas[i].hitbox_bala.y += (entidades[0][0].balas[i].direcao.y) * 10;
+
+        DrawTextureV(entidades[0][0].balas[i].sprite_bala,
+                     (Vector2){entidades[0][0].balas[i].hitbox_bala.x, entidades[0][0].balas[i].hitbox_bala.y},
+                     WHITE);
+
+        if (entidades[0][0].balas[i].hitbox_bala.x < 0 || 
+            entidades[0][0].balas[i].hitbox_bala.x > GetScreenWidth() ||
+            entidades[0][0].balas[i].hitbox_bala.y < 0 || 
+            entidades[0][0].balas[i].hitbox_bala.y > GetScreenHeight()) {
+            // Se a bala sair da tela, remove ela
+            UnloadTexture(entidades[0][0].balas[i].sprite_bala);
+            for (int j = i; j < entidades[0][0].qtd_balas - 1; j++) {
+                entidades[0][0].balas[j] = entidades[0][0].balas[j + 1];
+            }
+            entidades[0][0].qtd_balas--;
+            i--; // Decrementa i para verificar o novo elemento na posição i
+        }
+    }
+    //daí depois faz um loop para cada tipo de npc q atira
+    //atualiza a posição das balas do boss
+    for (int i = 0; i < entidades[4][0].qtd_balas; i++) {
+        entidades[4][0].balas[i].hitbox_bala.x += (entidades[4][0].balas[i].direcao.x) * 10;
+        entidades[4][0].balas[i].hitbox_bala.y += (entidades[4][0].balas[i].direcao.y) * 10;
+
+        DrawTextureV(entidades[4][0].balas[i].sprite_bala,
+                     (Vector2){entidades[4][0].balas[i].hitbox_bala.x, entidades[4][0].balas[i].hitbox_bala.y},
+                     WHITE);
+        
+        if (entidades[4][0].balas[i].hitbox_bala.x < 0 || 
+            entidades[4][0].balas[i].hitbox_bala.x > GetScreenWidth() ||
+            entidades[4][0].balas[i].hitbox_bala.y < 0 ||
+            entidades[4][0].balas[i].hitbox_bala.y > GetScreenHeight()) {
+            // Se a bala sair da tela, remove ela
+            UnloadTexture(entidades[4][0].balas[i].sprite_bala);
+            for (int j = i; j < entidades[4][0].qtd_balas - 1; j++) {
+                entidades[4][0].balas[j] = entidades[4][0].balas[j + 1];
+            }
+            entidades[4][0].qtd_balas--;
+            i--; // Decrementa i para verificar o novo elemento na posição i
+        }
+    
     }
 }

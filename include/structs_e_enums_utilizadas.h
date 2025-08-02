@@ -6,6 +6,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+typedef struct Bullet { 
+    Vector2 direcao; 
+    Rectangle hitbox_bala; //hitbox da bala
+    Texture2D sprite_bala;
+} Bullet;
+
 // Estrutura base de um Personagem (inimigo, player, boss, etc.)
 typedef struct Personagens 
 {
@@ -17,6 +23,9 @@ typedef struct Personagens
     int HP; // Quantidade de vida do personagem
     int speed; // Velocidade com o que o personagem vai se mover
     Rectangle hitbox; // Hitbox (Retangulo) associada ao personagem
+
+    Bullet* balas; //vetor dinâmico para armazenar as balas
+    int qtd_balas;
 } Personagens;
 
 //Achei legal fazer um enum dos tipos de Personagens que vai ter, vai que pode ser útil.
@@ -28,5 +37,6 @@ enum Tipo_Personagem
     Atirador_Vertical,
     Boss
 };
+
 
 #endif //STRUCTS_E_ENUMS_UTILIZADAS_H

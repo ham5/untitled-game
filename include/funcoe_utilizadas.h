@@ -18,4 +18,22 @@ Personagens** inicializar();
 // Função de mover o player (e mudar seu sentido)
 void mover_player(Personagens* player);
 
+//função de atirar 
+void atirar(Personagens *player, Image sprite);
+
+//função de mover balas
+void mover_balas(Personagens **entidades);
+
+//movimentação geral do boss
+void movimentacao_boss(Personagens* boss, Personagens* player, Image bala_imagem, int *timer);
+
+//cria o boss
+Personagens criar_boss(char sentido, float posicao_x, float posicao_y, Image imagem_N, Image imagem_S, Image imagem_W, Image imagem_E);
+
+//função para o na direção x e y (usado pelo boss)
+void atirar_boss(Personagens *boss, Image sprite, float dir_x, float dir_y);
+
+//função para atirar na direção do player
+void atirar_dir_player(Personagens *entidade, Personagens *player, Image sprite);
+
 #endif //FUNCOES_UTILIZADAS_H
