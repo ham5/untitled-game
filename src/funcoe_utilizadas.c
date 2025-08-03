@@ -78,14 +78,10 @@ void movimentacao_boss(Personagens* boss, Personagens* player, Image bala_imagem
     }
 
     if (boss->HP <= 2) { //fase 2
-    
-        if (*timer < 180) {
-            if (*timer % 20 == 0) { //3 tiros por segundo
-                atirar_dir_player(boss, player, bala_imagem);
-            }
-        }    
-        else {
-            *timer = 1; //reseta o timer (1 para evitar q o outro boss spawne)
+        if (*timer % 20 == 0) { //3 tiros por segundo
+            atirar_dir_player(boss, player, bala_imagem);
+        }
+        if (*timer % 180 == 0) {
             for (int i = 0; i < 360; i += 30) { //tiro pra todos os lados
                 float dir_x = cosf(i * (PI / 180.0f));
                 float dir_y = sinf(i * (PI / 180.0f));
@@ -93,8 +89,10 @@ void movimentacao_boss(Personagens* boss, Personagens* player, Image bala_imagem
             }
         }
 
-        if (boss->HP == 1) { //fase 3  
-            ;    
+        if (boss->HP == 1) { //fase 3 (mantém os ataques da fase 2)
+            if (*timer % 720 == 0) {
+                ; //colocar função de criar inimigo
+            }
         }
     }
 }

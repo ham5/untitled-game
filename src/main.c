@@ -113,8 +113,9 @@ int main (void)
             DrawText("MISSÃO: ENTRE NO PORTAL PARA ENFRENTAR O BOSS!", 10, GetScreenHeight() - 50, 30, WHITE);
             break;
             case 2:
-            if (personagens[0][0].HP <= 0) {
+            if (personagens[0][0].HP == 0) {
                 DrawText("MORREU ZÉ", 10, GetScreenHeight() - 50, 30, WHITE); //só p testar
+                background = criar_background("background/foxe.png");
             }else {
                 DrawText("MISSÃO: DERROTE O BOSS!", 10, GetScreenHeight() - 50, 30, WHITE);
             }
