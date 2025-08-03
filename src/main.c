@@ -24,7 +24,7 @@ int main (void)
                                         LoadImage("characters/Robo_Gladiador_EAST.png"), 
                                         3, 3, 50, 50);
 
-    
+    int qtd_entidades[5] = {1, 0, 0, 0, 0} ; // Quantidade de entidades de cada tipo
 
     int stage_sequence = 0; // 0 = Primeiro estágio; 1 = Transição_Primeiro_e_Boss; 2 = Boss;
     double time = 0;
@@ -61,19 +61,24 @@ int main (void)
         if (stage_sequence == 1 && CheckCollisionCircleRec(middle_circle, 30, personagens[0][0].hitbox))
         {
             //Lembrar de limpar todos os inimigos da tela
+            stage_sequence = 2;
+            UnloadTexture(background); // Descarrega o background antigo
+            background = criar_background("background/Sala_Boss.png");
+            time = 0;
+        }
+        if (stage_sequence == 2)
+        {
             if (timer == 0) { //cria o boss
                 personagens[4][0] = criar_boss('S', (GetScreenWidth() / 2), (GetScreenHeight() / 2) + 70,
                                         LoadImage("characters/Robo_Gladiador_NORTH.png"),
                                         LoadImage("characters/Robo_Gladiador_SOUTH.png"),
                                         LoadImage("characters/Robo_Gladiador_WEST.png"),
                                         LoadImage("characters/Robo_Gladiador_EAST.png"));
+
+                qtd_entidades[4] = 1; // Atualiza a quantidade de entidades do tipo boss
             }
-            timer++;    
             movimentacao_boss(&personagens[4][0], &personagens[0][0], bala_image, &timer);
-            stage_sequence = 2;
-            UnloadTexture(background); // Descarrega o background antigo
-            background = criar_background("background/Sala_Boss.png");
-            time = 0;
+            timer++;
         }
 
         // DRAWING
@@ -108,13 +113,18 @@ int main (void)
             DrawText("MISSÃO: ENTRE NO PORTAL PARA ENFRENTAR O BOSS!", 10, GetScreenHeight() - 50, 30, WHITE);
             break;
             case 2:
-            DrawText("MISSÃO: DERROTE O BOSS!", 10, GetScreenHeight() - 50, 30, WHITE);
+            if (personagens[0][0].HP <= 0) {
+                DrawText("MORREU ZÉ", 10, GetScreenHeight() - 50, 30, WHITE); //só p testar
+            }else {
+                DrawText("MISSÃO: DERROTE O BOSS!", 10, GetScreenHeight() - 50, 30, WHITE);
+            }
+            desenhar_boss(&personagens[4][0]);
+
             break;
         }
         
         DrawTextureV(textura_atual_player, (Vector2){personagens[0][0].hitbox.x, personagens[0][0].hitbox.y}, WHITE);
-        mover_balas(personagens);
-        
+        mover_balas(personagens, &qtd_entidades);
         EndDrawing();
     }
     
