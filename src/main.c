@@ -131,6 +131,9 @@ int main (void)
     
     // LIMPEZA FINAL (é bom fazer uma função disso no futuro)
     destruir_personagem(personagens[0][0]);
+    if(stage_sequence==2){
+        destruir_personagem(personagens[4][0]);
+    }
     UnloadTexture(background);
     UnloadImage(bala_image);
     free(personagens[0]);

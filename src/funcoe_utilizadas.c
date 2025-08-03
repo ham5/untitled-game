@@ -348,3 +348,157 @@ void mover_balas(Personagens **entidades, int (*qtd_entidades)[5]) {
 
     }  
 }
+
+void mover_inimigo (Personagens* inimigo, Personagens* player){
+    //definindo distancias nos eixos x e y
+    float dx = player->hitbox.x - inimigo->hitbox.x;
+    float dy = player->hitbox.y - inimigo->hitbox.y;
+    //vetor da direcao
+    float distancia = sqrt(dx*dx + dy*dy);
+    if(distancia>0){
+        dx = dx/distancia;
+        dy = dy/distancia;
+    }
+    //movimentações
+    inimigo->hitbox.x += dx * inimigo->speed;
+    inimigo->hitbox.y += dy * inimigo->speed;
+
+    if(fabs(dx)>fabs(dy)){//movimento predominante horizontal
+        if(dx>0)inimigo->sentido = 'E';
+        else inimigo->sentido = 'W';
+    }
+    else {//movimento predominante vertical
+        if(dy>0)inimigo->sentido = 'S';
+        else inimigo->sentido = 'N';
+    }
+}
+
+
+
+void adicionar_inimigo(Personagens** entidades, int (*qtd_entidades)[5], int spawn_x, int spawn_y, int id, Image IMAGEM_N, Image IMAGEM_S, Image IMAGEM_W, Image IMAGEM_E)
+{
+    int index_entidade;
+    Personagens* temp = NULL;
+    temp = (Personagens*) realloc(entidades[id], ((*qtd_entidades)[id] + 1) * sizeof(Personagens));
+
+    if (temp == NULL) 
+    {
+        //erro de memoria
+        exit(10);
+    }
+    entidades[id] = temp;
+
+    int qtd_entidade = (*qtd_entidades)[id]++;
+    switch (id) //Personagens criar_personagem(char sentido, float posicao_x, float posicao_y, Image imagem_N, Image imagem_S, Image imagem_W, Image imagem_E, int HP, int speed, int tamanho, int largura);
+
+    {
+    case 1:
+        entidades[id][qtd_entidade] = criar_personagem('S', spawn_x, spawn_y, IMAGEM_N, IMAGEM_S, IMAGEM_W, IMAGEM_E, 1, 2, 50, 50); //status inimigos 1
+        
+        break;
+    case 2:
+        entidades[id][qtd_entidade] = criar_personagem('S', spawn_x, spawn_y, IMAGEM_N, IMAGEM_S, IMAGEM_W, IMAGEM_E, 1, 2, 50, 50); //statos inimigos 2
+
+        break;
+    case 3:
+        entidades[id][qtd_entidade] = criar_personagem('S', spawn_x, spawn_y, IMAGEM_N, IMAGEM_S, IMAGEM_W, IMAGEM_E, 1, 2, 50, 50); //statos inimigos 3
+        break;
+    }
+    
+}
+
+void spawnador(Personagens** entidades,  int (*qtd_entidades)[5], Image IMAGEM_N, Image IMAGEM_S, Image IMAGEM_W, Image IMAGEM_E){
+    int tipo = (rand() % 3)+1;
+    int beirada = (rand()%4)+1; 
+    int x = 10000;
+    int y = 10000;
+    switch (beirada)
+    {
+    case 1:
+        x=0;
+        y = rand();
+        break;
+    
+    case 2:
+        y=GetScreenHeight();
+        break;
+    case 3:
+        x = GetScreenWidth();
+        break;
+    case 4:
+        y=0;
+        break;
+    }
+    for(int i = 0; i < 6;i++){
+        
+        adicionar_inimigo(entidades, (*qtd_entidades)[5], x, y, tipo, IMAGEM_N, IMAGEM_S, IMAGEM_W, IMAGEM_E);
+
+    }
+}
+
+
+void desenhar_inimigos(Personagens** entidades, int (*qtd_entidades)[5]){
+    for(int i = 0;i<qtd_entidades[1];i++){
+        Texture2D textura;
+        switch (entidades[1][i].sentido)
+        {
+       
+
+        case 'N': 
+            textura = entidades[1][i].sprite_N;
+            break;
+        case 'S': 
+            textura = entidades[1][i].sprite_S;
+            break;
+        case 'W': 
+            textura = entidades[1][i].sprite_W;
+            break;
+        case 'E': 
+            textura = entidades[1][i].sprite_E;
+            break;
+        }
+        DrawTextureV(textura, (Vector2){entidades[1][i].hitbox.x, entidades[1][i].hitbox.y}, WHITE);
+    }
+    for(int i = 0; i<qtd_entidades[2];i++){
+        Texture2D textura;
+        switch (entidades[2][i].sentido)
+        {
+       
+        case 'N': 
+            textura = entidades[2][i].sprite_N;
+            break;
+        case 'S': 
+            textura = entidades[2][i].sprite_S;
+            break;
+        case 'W': 
+            textura = entidades[2][i].sprite_W;
+            break;
+        case 'E': 
+            textura = entidades[2][i].sprite_E;
+            break;
+        }
+        DrawTextureV(textura, (Vector2){entidades[2][i].hitbox.x, entidades[2][i].hitbox.y}, WHITE);
+    }
+    for(int i = 0; i<qtd_entidades[3];i++){
+        Texture2D textura;
+        switch (entidades[3][i].sentido)
+        {
+       
+        case 'N': 
+            textura = entidades[3][i].sprite_N;
+            break;
+        case 'S': 
+            textura = entidades[3][i].sprite_S;
+            break;
+        case 'W': 
+            textura = entidades[3][i].sprite_W;
+            break;
+        case 'E': 
+            textura = entidades[3][i].sprite_E;
+            break;
+        }
+        DrawTextureV(textura, (Vector2){entidades[3][i].hitbox.x, entidades[3][i].hitbox.y}, WHITE);
+    }
+
+        
+}
