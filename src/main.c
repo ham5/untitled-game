@@ -20,7 +20,7 @@ int main (){
 	// informa à janela para usar V-Sync e funcionar em telas com alta densidade de pixels (HiDPI)
 	SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
 
-	// define largura e altura da tela
+	// define largura e altura da tela (não alterar aqui)
 	const int screenWidth = 1280;
 	const int screenHeight = 720;
 	
@@ -36,7 +36,7 @@ int main (){
 	// executa o loop até o usuário pressionar ESC, clicar no botão de fechar da janela ou clicar na opção SAIR
 	while (!WindowShouldClose() && !exit){
 
-		int MenuFontSize = 30;
+		const int MenuFontSize = 30;
 
 		// ------------ desenha a tela ----------------
 		BeginDrawing();
@@ -54,15 +54,19 @@ int main (){
 					break;
 						
 				case PLAY:
-					DrawText("TELA DE JOGO", (GetScreenWidth() - MeasureText("TELA DE JOGO", MenuFontSize)) / 2, (GetScreenHeight() - MenuFontSize) / 2, MenuFontSize, LIGHTGRAY);
+					DrawText("TELA DE JOGO...", (GetScreenWidth() - MeasureText("TELA DE JOGO...", MenuFontSize)) / 2, (GetScreenHeight() - MenuFontSize) / 2, MenuFontSize, LIGHTGRAY);
 					break;
 					
 				case CONFIGURATIONS:
-					DrawText("CONFIGURAÇÕES", (GetScreenWidth() - MeasureText("CONFIGURAÇÕES", MenuFontSize)) / 2, (GetScreenHeight() - MenuFontSize) / 2, MenuFontSize, LIGHTGRAY);
+					DrawText("CONFIGURAÇÕES", (GetScreenWidth() - MeasureText("CONFIGURAÇÕES", MenuFontSize)) / 2, (GetScreenHeight() - MenuFontSize) / 2 - 250, MenuFontSize, LIGHTGRAY);
+
+					DrawText("VOLTAR", (GetScreenWidth() - MeasureText("VOLTAR", MenuFontSize)) / 2,  (GetScreenHeight() - MenuFontSize) / 2 + 250, MenuFontSize, LIGHTGRAY);
 					break;
 					
 				case DEVELOPERS:
-					DrawText("DESENVOLVEDORES", (GetScreenWidth() - MeasureText("DESENVOLVEDORES", MenuFontSize)) / 2,  (GetScreenHeight() - MenuFontSize) / 2, MenuFontSize, LIGHTGRAY);
+					DrawText("DESENVOLVEDORES", (GetScreenWidth() - MeasureText("DESENVOLVEDORES", MenuFontSize)) / 2,  (GetScreenHeight() - MenuFontSize) / 2 - 250, MenuFontSize, LIGHTGRAY);
+
+					DrawText("VOLTAR", (GetScreenWidth() - MeasureText("VOLTAR", MenuFontSize)) / 2,  (GetScreenHeight() - MenuFontSize) / 2 + 250, MenuFontSize, LIGHTGRAY);
 					break;
 				
 				default:
@@ -70,6 +74,57 @@ int main (){
 			}
 
 		EndDrawing();
+		
+		// ------------ armazena as áreas dos botões ----------------
+		Rectangle playButtonArea = {(GetScreenWidth() - MeasureText("JOGAR", MenuFontSize)) / 2, (GetScreenHeight() - MenuFontSize) / 2 + 100, MeasureText("JOGAR", MenuFontSize), MenuFontSize};
+		
+		Rectangle configButtonArea = {(GetScreenWidth() - MeasureText("CONFIGURAÇÕES", MenuFontSize)) / 2, (GetScreenHeight() - MenuFontSize) / 2 + 150, MeasureText("CONFIGURAÇÕES", MenuFontSize), MenuFontSize};
+		
+		Rectangle devButtonArea = {(GetScreenWidth() - MeasureText("DESENVOLVEDORES", MenuFontSize)) / 2, (GetScreenHeight() - MenuFontSize) / 2 + 200, MeasureText("DESENVOLVEDORES", MenuFontSize), MenuFontSize};
+		
+		Rectangle exitButtonArea = {(GetScreenWidth() - MeasureText("SAIR", MenuFontSize)) / 2, (GetScreenHeight() - MenuFontSize) / 2 + 250, MeasureText("SAIR", MenuFontSize), MenuFontSize};
+
+		Rectangle backButtonArea = {(GetScreenWidth() - MeasureText("VOLTAR", MenuFontSize)) / 2, (GetScreenHeight() - MenuFontSize) / 2 + 250, MeasureText("VOLTAR", MenuFontSize), MenuFontSize};
+		
+		// armazena a posição do mouse
+		Vector2 mousePosition = GetMousePosition();
+
+		// ------------ atualiza a tela ----------------
+		switch (currentScreen){	// verifica se um dos botões foi pressionado, de acordo com a tela atual
+			case INIT:
+				if (CheckCollisionPointRec(mousePosition, playButtonArea) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){ // se usuário apertou "JOGAR"
+					currentScreen = PLAY;
+
+				} else if (CheckCollisionPointRec(mousePosition, configButtonArea) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){ // se usuário apertou "CONFIGURAÇÕES"
+					currentScreen = CONFIGURATIONS;
+
+				} else if (CheckCollisionPointRec(mousePosition, devButtonArea) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){ // se usuário apertou "DESENVOLVEDORES"
+					currentScreen = DEVELOPERS;
+
+				} else if (CheckCollisionPointRec(mousePosition, exitButtonArea) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){ // se usuário apertou "SAIR"
+					exit = true;
+				}
+				break;
+
+			case PLAY:
+				// em breve haverá um botão de configurações no canto superior direito da tela
+				break;
+
+			case CONFIGURATIONS:
+				if (CheckCollisionPointRec(mousePosition, backButtonArea) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){ // se usuário apertou "VOLTAR"
+					currentScreen = INIT;
+				}
+				break;
+
+			case DEVELOPERS:
+				if (CheckCollisionPointRec(mousePosition, backButtonArea) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){ // se usuário apertou "VOLTAR"
+					currentScreen = INIT;
+				}
+				break;
+			
+			default:
+				break;
+		}
 	}
 	// destrói a janela e limpa o contexto OpenGL
 	CloseWindow();
