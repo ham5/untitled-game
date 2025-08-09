@@ -1,0 +1,1 @@
+cd /mnt/d/C_Projects/Projeto\ P.I/untitled-game && make clean && make && ./jogo
