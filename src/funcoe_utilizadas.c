@@ -395,7 +395,7 @@ void tela_opcoes(GameScreen *tela_atual, Texture2D background, float *volume)
     Rectangle volumeSliderHandle = { volumeSliderBar.x + (*volume * volumeSliderBar.width) - 10, GetScreenHeight()/2.0f - 20, 20, 40 };
     Rectangle backButton = { GetScreenWidth()/2 - 100, GetScreenHeight()/2 + 100, 200, 50 };
 
-    Vector2 mousePoint = GetMousePosition(); //
+    Vector2 mousePoint = GetMousePosition();
 
     // Lógica para arrastar a barra de volume
     if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mousePoint, volumeSliderBar))
@@ -427,7 +427,7 @@ void tela_opcoes(GameScreen *tela_atual, Texture2D background, float *volume)
 void tela_creditos(GameScreen *tela_atual, Texture2D imagemcreditos)
 {
     //Lógica de Update dos Créditos
-    Rectangle backButton = { GetScreenWidth()/2.0 - 100, GetScreenHeight() - 100, 200, 50 };
+    Rectangle backButton = { GetScreenWidth()/2 - 100, GetScreenHeight() - 100, 200, 50 };
     Vector2 mousePoint = GetMousePosition();
 
     if (CheckCollisionPointRec(mousePoint, backButton) && IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) *tela_atual = MENU;
