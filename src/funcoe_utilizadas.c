@@ -362,26 +362,20 @@ void tela_menu(GameScreen *tela_atual, Texture2D background)
     // Checa clique no mouse dentro da area dos botoes
     if (CheckCollisionPointRec(mousePoint, playButton) && IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) *tela_atual = GAMEPLAY;
     if (CheckCollisionPointRec(mousePoint, optionsButton) && IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) *tela_atual = OPTIONS;
-    if (CheckCollisionPointRec(mousePoint, creditsButton) && IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) *tela_atual = CREDITS;
+    if (CheckCollisionPointRec(mousePoint, creditsButton) && IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) *tela_atual = CREDITOS;
     if (CheckCollisionPointRec(mousePoint, exitButton) && IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) CloseWindow();
 
     //posições dos botoes de menu
     BeginDrawing();
     DrawTexture(background, 0, 0, WHITE);
 
-    const char *title = "Coliseu";
-    int textWidth = MeasureText(title, 80); // Medição da largura do texto
-    DrawText(title, GetScreenWidth()/2 - textWidth/2, 100, 80, WHITE);
-    
+    DrawText("Coliseu", GetScreenWidth()/2 - MeasureText("Coliseu", 80)/2, 100, 80, WHITE);
     DrawRectangleRec(playButton, LIGHTGRAY);
     DrawText("Jogar", playButton.x + 75, playButton.y + 10, 30, DARKGRAY);
-
     DrawRectangleRec(optionsButton, LIGHTGRAY);
     DrawText("Opções", optionsButton.x + 65, optionsButton.y + 10, 30, DARKGRAY);
-
     DrawRectangleRec(creditsButton, LIGHTGRAY);
     DrawText("Créditos", creditsButton.x + 55, creditsButton.y + 10, 30, DARKGRAY);
-    
     DrawRectangleRec(exitButton, LIGHTGRAY);
     DrawText("Sair do Jogo", exitButton.x + 30, exitButton.y + 10, 30, DARKGRAY);
     EndDrawing();
@@ -394,10 +388,9 @@ void tela_opcoes(GameScreen *tela_atual, Texture2D background, float *volume)
     // A posição do handle depende do volume recebido pelo mastervolume
     Rectangle volumeSliderHandle = { volumeSliderBar.x + (*volume * volumeSliderBar.width) - 10, GetScreenHeight()/2.0f - 20, 20, 40 };
     Rectangle backButton = { GetScreenWidth()/2 - 100, GetScreenHeight()/2 + 100, 200, 50 };
-
     Vector2 mousePoint = GetMousePosition();
 
-    // Lógica para arrastar a barra de volume
+    //Lógica para arrastar a barra de volume
     if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mousePoint, volumeSliderBar))
     {
         // Altera o valor do volume usando a coordenada do mouse
@@ -406,7 +399,7 @@ void tela_opcoes(GameScreen *tela_atual, Texture2D background, float *volume)
         if (*volume > 1.0) *volume = 1.0;
         SetMasterVolume(*volume); // Aplica o novo volume
     }
-    
+    // checka clique do mouse dentro da area do botão
     if (CheckCollisionPointRec(mousePoint, backButton) && IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) *tela_atual = MENU;
     
     //posições do menu de opções
@@ -426,16 +419,60 @@ void tela_opcoes(GameScreen *tela_atual, Texture2D background, float *volume)
 
 void tela_creditos(GameScreen *tela_atual, Texture2D imagemcreditos)
 {
-    //Lógica de Update dos Créditos
+    //botao de voltar
     Rectangle backButton = { GetScreenWidth()/2 - 100, GetScreenHeight() - 100, 200, 50 };
     Vector2 mousePoint = GetMousePosition();
 
     if (CheckCollisionPointRec(mousePoint, backButton) && IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) *tela_atual = MENU;
     
-    //Desenho dos Créditos
+    //posições dos Créditos
     BeginDrawing();
     DrawTexture(imagemcreditos, 0, 0, WHITE);
     DrawRectangleRec(backButton, LIGHTGRAY);
     DrawText("Voltar", backButton.x + 55, backButton.y + 10, 30, DARKGRAY);
+    EndDrawing();
+}
+
+void tela_morte(GameScreen *tela_atual, Texture2D mortebackground)
+{
+
+    Rectangle menuButton = { GetScreenWidth()/2 - 125, GetScreenHeight()/2 + 90, 250, 50 };
+    Rectangle exitButton = { GetScreenWidth()/2 - 125, GetScreenHeight()/2 + 160, 250, 50 };
+    Vector2 mousePoint = GetMousePosition();
+
+    // Checa clique no mouse dentro da area dos botoes
+    if (CheckCollisionPointRec(mousePoint, menuButton) && IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) *tela_atual = MENU;
+    if (CheckCollisionPointRec(mousePoint, exitButton) && IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) CloseWindow();
+
+    //posições da tela de morte
+    BeginDrawing();
+    DrawTexture(mortebackground, 0, 0, WHITE);
+    DrawText("VOCÊ MORREU", GetScreenWidth()/2 - MeasureText("VOCÊ MORREU", 100)/2, 350, 100, RED);
+    DrawRectangleRec(menuButton, DARKGRAY);
+    DrawText("Voltar ao Menu", menuButton.x + 7, menuButton.y + 10, 30, RED);
+    DrawRectangleRec(exitButton, DARKGRAY);
+    DrawText("Sair do Jogo", exitButton.x + 30, exitButton.y + 10, 30, RED);
+    EndDrawing();
+}
+
+void tela_vitoria(GameScreen *tela_atual, Texture2D vitoriabackground)
+{
+
+    Rectangle menuButton = { GetScreenWidth()/2 - 125, GetScreenHeight()/2 + 90, 250, 50 };
+    Rectangle exitButton = { GetScreenWidth()/2 - 125, GetScreenHeight()/2 + 160, 250, 50 };
+    Vector2 mousePoint = GetMousePosition();
+
+    // Checa clique no mouse dentro da area dos botoes
+    if (CheckCollisionPointRec(mousePoint, menuButton) && IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) *tela_atual = MENU;
+    if (CheckCollisionPointRec(mousePoint, exitButton) && IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) CloseWindow();
+
+    //posições da tela de vitoria
+    BeginDrawing();
+    DrawTexture(vitoriabackground, 0, 0, WHITE);
+    DrawText("VOCÊ VENCEU", GetScreenWidth()/2 - MeasureText("VOCÊ VENCEU", 100)/2, 350, 100, GREEN);
+    DrawRectangleRec(menuButton, LIGHTGRAY);
+    DrawText("Voltar ao Menu", menuButton.x + 7, menuButton.y + 10, 30, DARKGRAY);
+    DrawRectangleRec(exitButton, LIGHTGRAY);
+    DrawText("Sair do Jogo", exitButton.x + 30, exitButton.y + 10, 30, DARKGRAY);
     EndDrawing();
 }

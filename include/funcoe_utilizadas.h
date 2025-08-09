@@ -44,4 +44,7 @@ void tela_menu(GameScreen *tela_atual, Texture2D background);
 void tela_opcoes(GameScreen *tela_atual, Texture2D background, float *masterVolume);
 void tela_creditos(GameScreen *tela_atual, Texture2D imagemcreditos);
 
+void tela_morte(GameScreen *tela_atual, Texture2D mortebackground);
+void tela_vitoria(GameScreen *tela_atual, Texture2D vitoriabackground);
+
 #endif //FUNCOES_UTILIZADAS_H

@@ -42,8 +42,10 @@ enum Tipo_Personagem
 typedef enum GameScreen {
     MENU,
     OPTIONS,
-    CREDITS,
-    GAMEPLAY
+    CREDITOS,
+    GAMEPLAY,
+    MORTE,
+    VITORIA
 } GameScreen;
 
 #endif //STRUCTS_E_ENUMS_UTILIZADAS_H

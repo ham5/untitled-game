@@ -12,8 +12,10 @@ int main (void)
     float volume = 1.0;
     SetMasterVolume(volume);
 
-    Texture2D menuBackground = LoadTexture("background/Menu.png");
+    Texture2D menubackground = LoadTexture("background/Menu.png");
     Texture2D imagemcreditos = LoadTexture("background/creditos.png");
+    Texture2D mortebackground = LoadTexture("background/morte.png");
+    Texture2D vitoriabackground = LoadTexture("background/vitoria.png");
     
     Texture2D background;
     int qtd_entidades[5] = {0}; // Quantidade de entidades de cada tipo
@@ -25,8 +27,7 @@ int main (void)
     Image bala_image;
     int cooldown = 60; // Variável para controlar o cooldown do tiro
     int timer = 0; // Timer para controlar os movimentos do boss
-    bool gameplayInitialized = false;
-
+    bool gameplayiniciada = false;
     // loop principal do game
     while (WindowShouldClose() == false)
     {
@@ -34,15 +35,23 @@ int main (void)
         {
             case MENU:
             {
-                tela_menu(&tela_atual, menuBackground);
+                if (gameplayiniciada == true)
+                {
+                    destruir_personagem(personagens[0][0]);
+                    if(stage_sequence==2){
+                        destruir_personagem(personagens[4][0]);
+                    }
+                    gameplayiniciada = false;
+                }
+                tela_menu(&tela_atual, menubackground);
             } break;
             
             case OPTIONS:
             {
-                tela_opcoes(&tela_atual, menuBackground, &volume);
+                tela_opcoes(&tela_atual, menubackground, &volume);
             } break;
             
-            case CREDITS:
+            case CREDITOS:
             {
                 tela_creditos(&tela_atual, imagemcreditos);
             } break;
@@ -50,8 +59,16 @@ int main (void)
             case GAMEPLAY:
             {
                 // Inicializa as variáveis de gameplay apenas uma vez
-                if (gameplayInitialized == false)
+                if (gameplayiniciada == false)
                 {
+                    stage_sequence = 0;
+                    time = 0;
+                    timer = 0;
+                    
+                    for (int i = 0; i < 5; i++)
+                    {
+                        qtd_entidades[i] = 0; // zera a contagem de todos os personagens
+                    }
                     background = criar_background("background/Arena.png");
                     /*
                     EXPLICANDO O VETOR DE VETORES personagens
@@ -71,7 +88,7 @@ int main (void)
                     qtd_entidades[0] = 1;
 
                     bala_image = LoadImage("characters/wabbit_alpha.png");
-                    gameplayInitialized = true;
+                    gameplayiniciada = true;
                 }
 
                 cooldown++;
@@ -157,6 +174,10 @@ int main (void)
                             DrawText("MISSÃO: DERROTE O BOSS!", 10, GetScreenHeight() - 50, 30, WHITE);
                         }
                         desenhar_boss(&personagens[4][0]);
+
+                        if (personagens[4][0].HP <= 0){
+                            tela_atual = VITORIA;           // vitoria do personagem redireciona pra tela de vitoria
+                        }
                         break;
                 }
                 
@@ -164,6 +185,20 @@ int main (void)
                 mover_balas(personagens, &qtd_entidades);
                 EndDrawing();
 
+                if (personagens[0][0].HP <= 0){ // morte do personagem redireciona pra tela de gameover
+                    tela_atual = MORTE;
+                }
+
+            } break;
+
+            case MORTE:
+            {
+                tela_morte(&tela_atual, mortebackground);
+            } break;
+
+            case VITORIA:
+            {
+                tela_vitoria(&tela_atual, vitoriabackground);
             } break;
             
             default: break;
@@ -171,15 +206,19 @@ int main (void)
     }
     
     // LIMPEZA FINAL (é bom fazer uma função disso no futuro)
-    destruir_personagem(personagens[0][0]);
-    if(stage_sequence==2){
-        destruir_personagem(personagens[4][0]);
+    if (gameplayiniciada) {
+        destruir_personagem(personagens[0][0]);
+        if(stage_sequence==2){
+            destruir_personagem(personagens[4][0]);
+        }
     }
     UnloadTexture(background);
     UnloadImage(bala_image);
 
-    UnloadTexture(menuBackground);
+    UnloadTexture(menubackground);
     UnloadTexture(imagemcreditos);
+    UnloadTexture(mortebackground);
+    UnloadTexture(vitoriabackground);
 
     free(personagens[0]);
     free(personagens);
