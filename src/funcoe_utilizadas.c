@@ -349,156 +349,93 @@ void mover_balas(Personagens **entidades, int (*qtd_entidades)[5]) {
     }  
 }
 
-void mover_inimigo (Personagens* inimigo, Personagens* player){
-    //definindo distancias nos eixos x e y
-    float dx = player->hitbox.x - inimigo->hitbox.x;
-    float dy = player->hitbox.y - inimigo->hitbox.y;
-    //vetor da direcao
-    float distancia = sqrt(dx*dx + dy*dy);
-    if(distancia>0){
-        dx = dx/distancia;
-        dy = dy/distancia;
-    }
-    //movimentações
-    inimigo->hitbox.x += dx * inimigo->speed;
-    inimigo->hitbox.y += dy * inimigo->speed;
-
-    if(fabs(dx)>fabs(dy)){//movimento predominante horizontal
-        if(dx>0)inimigo->sentido = 'E';
-        else inimigo->sentido = 'W';
-    }
-    else {//movimento predominante vertical
-        if(dy>0)inimigo->sentido = 'S';
-        else inimigo->sentido = 'N';
-    }
-}
-
-
-
-void adicionar_inimigo(Personagens** entidades, int (*qtd_entidades)[5], int spawn_x, int spawn_y, int id, Image IMAGEM_N, Image IMAGEM_S, Image IMAGEM_W, Image IMAGEM_E)
+void tela_menu(GameScreen *tela_atual, Texture2D background)
 {
-    int index_entidade;
-    Personagens* temp = NULL;
-    temp = (Personagens*) realloc(entidades[id], ((*qtd_entidades)[id] + 1) * sizeof(Personagens));
+    //retangulos que servirao como area pros botoes
+    Rectangle playButton = { GetScreenWidth()/2 - 125, GetScreenHeight()/2 - 50, 250, 50 };
+    Rectangle optionsButton = { GetScreenWidth()/2 - 125, GetScreenHeight()/2 + 20, 250, 50 };
+    Rectangle creditsButton = { GetScreenWidth()/2 - 125, GetScreenHeight()/2 + 90, 250, 50 };
+    Rectangle exitButton = { GetScreenWidth()/2 - 125, GetScreenHeight()/2 + 160, 250, 50 };
 
-    if (temp == NULL) 
-    {
-        //erro de memoria
-        exit(10);
-    }
-    entidades[id] = temp;
+    Vector2 mousePoint = GetMousePosition();
 
-    int qtd_entidade = (*qtd_entidades)[id]++;
-    switch (id) //Personagens criar_personagem(char sentido, float posicao_x, float posicao_y, Image imagem_N, Image imagem_S, Image imagem_W, Image imagem_E, int HP, int speed, int tamanho, int largura);
+    // Checa clique no mouse dentro da area dos botoes
+    if (CheckCollisionPointRec(mousePoint, playButton) && IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) *tela_atual = GAMEPLAY;
+    if (CheckCollisionPointRec(mousePoint, optionsButton) && IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) *tela_atual = OPTIONS;
+    if (CheckCollisionPointRec(mousePoint, creditsButton) && IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) *tela_atual = CREDITS;
+    if (CheckCollisionPointRec(mousePoint, exitButton) && IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) CloseWindow();
 
-    {
-    case 1:
-        entidades[id][qtd_entidade] = criar_personagem('S', spawn_x, spawn_y, IMAGEM_N, IMAGEM_S, IMAGEM_W, IMAGEM_E, 1, 2, 50, 50); //status inimigos 1
-        
-        break;
-    case 2:
-        entidades[id][qtd_entidade] = criar_personagem('S', spawn_x, spawn_y, IMAGEM_N, IMAGEM_S, IMAGEM_W, IMAGEM_E, 1, 2, 50, 50); //statos inimigos 2
+    //posições dos botoes de menu
+    BeginDrawing();
+    DrawTexture(background, 0, 0, WHITE);
 
-        break;
-    case 3:
-        entidades[id][qtd_entidade] = criar_personagem('S', spawn_x, spawn_y, IMAGEM_N, IMAGEM_S, IMAGEM_W, IMAGEM_E, 1, 2, 50, 50); //statos inimigos 3
-        break;
-    }
+    const char *title = "Coliseu";
+    int textWidth = MeasureText(title, 80); // Medição da largura do texto
+    DrawText(title, GetScreenWidth()/2 - textWidth/2, 100, 80, WHITE);
     
+    DrawRectangleRec(playButton, LIGHTGRAY);
+    DrawText("Jogar", playButton.x + 75, playButton.y + 10, 30, DARKGRAY);
+
+    DrawRectangleRec(optionsButton, LIGHTGRAY);
+    DrawText("Opções", optionsButton.x + 65, optionsButton.y + 10, 30, DARKGRAY);
+
+    DrawRectangleRec(creditsButton, LIGHTGRAY);
+    DrawText("Créditos", creditsButton.x + 55, creditsButton.y + 10, 30, DARKGRAY);
+    
+    DrawRectangleRec(exitButton, LIGHTGRAY);
+    DrawText("Sair do Jogo", exitButton.x + 30, exitButton.y + 10, 30, DARKGRAY);
+    EndDrawing();
 }
 
-void spawnador(Personagens** entidades,  int (*qtd_entidades)[5], Image IMAGEM_N, Image IMAGEM_S, Image IMAGEM_W, Image IMAGEM_E){
-    int tipo = (rand() % 3)+1;
-    int beirada = (rand()%4)+1; 
-    int x = 10000;
-    int y = 10000;
-    switch (beirada)
-    {
-    case 1:
-        x=0;
-        y = rand();
-        break;
-    
-    case 2:
-        y=GetScreenHeight();
-        break;
-    case 3:
-        x = GetScreenWidth();
-        break;
-    case 4:
-        y=0;
-        break;
-    }
-    for(int i = 0; i < 6;i++){
-        
-        adicionar_inimigo(entidades, (*qtd_entidades)[5], x, y, tipo, IMAGEM_N, IMAGEM_S, IMAGEM_W, IMAGEM_E);
+void tela_opcoes(GameScreen *tela_atual, Texture2D background, float *volume)
+{
+    // barra e handle do volume
+    Rectangle volumeSliderBar = { GetScreenWidth()/2 - 150, GetScreenHeight()/2 - 10, 300, 20 };
+    // A posição do handle depende do volume recebido pelo mastervolume
+    Rectangle volumeSliderHandle = { volumeSliderBar.x + (*volume * volumeSliderBar.width) - 10, GetScreenHeight()/2.0f - 20, 20, 40 };
+    Rectangle backButton = { GetScreenWidth()/2 - 100, GetScreenHeight()/2 + 100, 200, 50 };
 
+    Vector2 mousePoint = GetMousePosition(); //
+
+    // Lógica para arrastar a barra de volume
+    if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mousePoint, volumeSliderBar))
+    {
+        // Altera o valor do volume usando a coordenada do mouse
+        *volume = (mousePoint.x - volumeSliderBar.x) / volumeSliderBar.width;
+        if (*volume < 0.0) *volume = 0.0;
+        if (*volume > 1.0) *volume = 1.0;
+        SetMasterVolume(*volume); // Aplica o novo volume
     }
+    
+    if (CheckCollisionPointRec(mousePoint, backButton) && IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) *tela_atual = MENU;
+    
+    //posições do menu de opções
+    BeginDrawing();
+    DrawTexture(background, 0, 0, WHITE);
+    
+    DrawText("Opções", GetScreenWidth()/2 - MeasureText("Opções", 40)/2, 150, 40, WHITE);
+    DrawText("Volume", GetScreenWidth()/2 - MeasureText("Volume", 30)/2, GetScreenHeight()/2 - 60, 30, WHITE);
+    
+    DrawRectangleRec(volumeSliderBar, LIGHTGRAY);
+    DrawRectangleRec(volumeSliderHandle, MAROON);
+    
+    DrawRectangleRec(backButton, LIGHTGRAY);
+    DrawText("Voltar", backButton.x + 55, backButton.y + 10, 30, DARKGRAY);
+    EndDrawing();
 }
 
+void tela_creditos(GameScreen *tela_atual, Texture2D imagemcreditos)
+{
+    //Lógica de Update dos Créditos
+    Rectangle backButton = { GetScreenWidth()/2.0 - 100, GetScreenHeight() - 100, 200, 50 };
+    Vector2 mousePoint = GetMousePosition();
 
-void desenhar_inimigos(Personagens** entidades, int (*qtd_entidades)[5]){
-    for(int i = 0;i<qtd_entidades[1];i++){
-        Texture2D textura;
-        switch (entidades[1][i].sentido)
-        {
-       
-
-        case 'N': 
-            textura = entidades[1][i].sprite_N;
-            break;
-        case 'S': 
-            textura = entidades[1][i].sprite_S;
-            break;
-        case 'W': 
-            textura = entidades[1][i].sprite_W;
-            break;
-        case 'E': 
-            textura = entidades[1][i].sprite_E;
-            break;
-        }
-        DrawTextureV(textura, (Vector2){entidades[1][i].hitbox.x, entidades[1][i].hitbox.y}, WHITE);
-    }
-    for(int i = 0; i<qtd_entidades[2];i++){
-        Texture2D textura;
-        switch (entidades[2][i].sentido)
-        {
-       
-        case 'N': 
-            textura = entidades[2][i].sprite_N;
-            break;
-        case 'S': 
-            textura = entidades[2][i].sprite_S;
-            break;
-        case 'W': 
-            textura = entidades[2][i].sprite_W;
-            break;
-        case 'E': 
-            textura = entidades[2][i].sprite_E;
-            break;
-        }
-        DrawTextureV(textura, (Vector2){entidades[2][i].hitbox.x, entidades[2][i].hitbox.y}, WHITE);
-    }
-    for(int i = 0; i<qtd_entidades[3];i++){
-        Texture2D textura;
-        switch (entidades[3][i].sentido)
-        {
-       
-        case 'N': 
-            textura = entidades[3][i].sprite_N;
-            break;
-        case 'S': 
-            textura = entidades[3][i].sprite_S;
-            break;
-        case 'W': 
-            textura = entidades[3][i].sprite_W;
-            break;
-        case 'E': 
-            textura = entidades[3][i].sprite_E;
-            break;
-        }
-        DrawTextureV(textura, (Vector2){entidades[3][i].hitbox.x, entidades[3][i].hitbox.y}, WHITE);
-    }
-
-        
+    if (CheckCollisionPointRec(mousePoint, backButton) && IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) *tela_atual = MENU;
+    
+    //Desenho dos Créditos
+    BeginDrawing();
+    DrawTexture(imagemcreditos, 0, 0, WHITE);
+    DrawRectangleRec(backButton, LIGHTGRAY);
+    DrawText("Voltar", backButton.x + 55, backButton.y + 10, 30, DARKGRAY);
+    EndDrawing();
 }

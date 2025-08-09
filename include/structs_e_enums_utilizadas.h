@@ -38,5 +38,12 @@ enum Tipo_Personagem
     Boss
 };
 
+// Enum pro switchcase para deixar o codigo mais legivel
+typedef enum GameScreen {
+    MENU,
+    OPTIONS,
+    CREDITS,
+    GAMEPLAY
+} GameScreen;
 
 #endif //STRUCTS_E_ENUMS_UTILIZADAS_H

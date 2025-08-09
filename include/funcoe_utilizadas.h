@@ -39,4 +39,9 @@ void atirar_dir_player(Personagens *entidade, Personagens *player, Image sprite)
 //função para desenhar o boss
 void desenhar_boss(Personagens *boss);
 
+//funções do menu
+void tela_menu(GameScreen *tela_atual, Texture2D background);
+void tela_opcoes(GameScreen *tela_atual, Texture2D background, float *masterVolume);
+void tela_creditos(GameScreen *tela_atual, Texture2D imagemcreditos);
+
 #endif //FUNCOES_UTILIZADAS_H
