@@ -25,6 +25,8 @@ int main (){
 	// função utilitária de resource_dir.h para encontrar a pasta de recursos e defini-la como diretório de trabalho atual, assim podemos carregar as imagens a partir dela
 	SearchAndSetResourceDir("resources");
 
+	Texture menuImage = LoadTexture("menu/menu.png");
+
 	GameState state = {.currentScreen = INIT,
 					   .audio = true,
 					   .exit = false };
@@ -35,7 +37,9 @@ int main (){
 
 		// ------------ desenha a tela ----------------
 		BeginDrawing();
+
 			ClearBackground(RAYWHITE); // limpa o background
+			DrawTexture(menuImage, 0, 0, WHITE); // carrega imagem do menu
 
 			switch(state.currentScreen){
 				case INIT:
@@ -64,6 +68,8 @@ int main (){
 		updateGameState(&state, fontSize);
 
 	}
+	// libera a memória
+	UnloadTexture(menuImage);
 	// destrói a janela e limpa o contexto OpenGL
 	CloseWindow();
 	

@@ -64,12 +64,12 @@ void inputAudioConfig(const int fontSize, const bool audio){
 	int configOffset = 0;
 
 	const char *configAudioName = "AUDIO ";
-	DrawText(configAudioName, GetScreenWidth() / 2 - MeasureText(configAudioName, fontSize), (GetScreenHeight() - fontSize) / 2 + configOffset, fontSize, LIGHTGRAY);
+	DrawText(configAudioName, GetScreenWidth() / 2 - MeasureText(configAudioName, fontSize), (GetScreenHeight() - fontSize) / 2 + configOffset, fontSize, WHITE);
 
 	if (audio == true){
-		DrawText("< ON >", GetScreenWidth() / 2, (GetScreenHeight() - fontSize) / 2 + configOffset, fontSize, LIGHTGRAY);
+		DrawText("< ON >", GetScreenWidth() / 2, (GetScreenHeight() - fontSize) / 2 + configOffset, fontSize, WHITE);
 	} else{
-		DrawText( "< OFF >", GetScreenWidth() / 2, (GetScreenHeight() - fontSize) / 2 + configOffset, fontSize, LIGHTGRAY);
+		DrawText( "< OFF >", GetScreenWidth() / 2, (GetScreenHeight() - fontSize) / 2 + configOffset, fontSize, WHITE);
 	}
 }
 
@@ -82,14 +82,14 @@ void showInitScreen(const int fontSize){
 	int optOffset = 100;
 
 	const char *title = "UNTITLED GAME";
-	DrawText(title, (GetScreenWidth() - MeasureText(title, titleFontSize)) / 2, (GetScreenHeight() - titleFontSize) / 2 + titleOffset, titleFontSize, LIGHTGRAY);
+	DrawText(title, (GetScreenWidth() - MeasureText(title, titleFontSize)) / 2, (GetScreenHeight() - titleFontSize) / 2 + titleOffset, titleFontSize, WHITE);
 
 	const char *const options[] = {"JOGAR", 
 					   "CONFIGURAÇÕES",
 					   "DESENVOLVEDORES",
 					   "SAIR"};
 	for (int i = 0; i < 4; i++){
-		DrawText(options[i], (GetScreenWidth() - MeasureText(options[i], fontSize)) / 2, (GetScreenHeight() - fontSize) / 2 + optOffset, fontSize, LIGHTGRAY);
+		DrawText(options[i], (GetScreenWidth() - MeasureText(options[i], fontSize)) / 2, (GetScreenHeight() - fontSize) / 2 + optOffset, fontSize, WHITE);
 		optOffset += 50;
 	}
 }
@@ -103,12 +103,12 @@ void showConfigScreen(const int fontSize, const bool audio){
 	int optOffset = 250;
 
 	const char *title = "CONFIGURAÇÕES";
-	DrawText(title, (GetScreenWidth() - MeasureText(title, titleFontSize)) / 2, (GetScreenHeight() - titleFontSize) / 2 + titleOffset, titleFontSize, LIGHTGRAY);
+	DrawText(title, (GetScreenWidth() - MeasureText(title, titleFontSize)) / 2, (GetScreenHeight() - titleFontSize) / 2 + titleOffset, titleFontSize, WHITE);
 
 	inputAudioConfig(fontSize, audio);
 
 	const char *option = "VOLTAR";
-	DrawText(option, (GetScreenWidth() - MeasureText(option, fontSize)) / 2, (GetScreenHeight() - fontSize) / 2 + optOffset, fontSize, LIGHTGRAY);
+	DrawText(option, (GetScreenWidth() - MeasureText(option, fontSize)) / 2, (GetScreenHeight() - fontSize) / 2 + optOffset, fontSize, WHITE);
 }
 
 void showDevelopScreen(const int fontSize){
@@ -120,8 +120,8 @@ void showDevelopScreen(const int fontSize){
 	int textOffset = -150;
 	int optOffset = 250;
 	
-	char title[] = "DESENVOLVEDORES";
-	DrawText(title, (GetScreenWidth() - MeasureText(title, titleFontSize)) / 2,  (GetScreenHeight() - titleFontSize) / 2 + titleOffset, titleFontSize, LIGHTGRAY);
+	const char *title = "DESENVOLVEDORES";
+	DrawText(title, (GetScreenWidth() - MeasureText(title, titleFontSize)) / 2,  (GetScreenHeight() - titleFontSize) / 2 + titleOffset, titleFontSize, WHITE);
 
 	char *developers[] = {"EDIVALDO AMBROZIO DA SILVA FILHO",
 						  "GUILHERME DE CARVALHO FABRI",
@@ -131,10 +131,10 @@ void showDevelopScreen(const int fontSize){
 						  "TITHO LÍVIO DUARTE MELO"};
 
 	for (int i = 0; i < 6; i++){
-		DrawText(developers[i], (GetScreenWidth() - MeasureText(developers[i], fontSize)) / 2,  (GetScreenHeight() - fontSize) / 2 + textOffset, fontSize, LIGHTGRAY);
+		DrawText(developers[i], (GetScreenWidth() - MeasureText(developers[i], fontSize)) / 2,  (GetScreenHeight() - fontSize) / 2 + textOffset, fontSize, WHITE);
 		textOffset += 50;
 	}
 
-	char option[] = "VOLTAR";
-	DrawText(option, (GetScreenWidth() - MeasureText(option, fontSize)) / 2,  (GetScreenHeight() - fontSize) / 2 + optOffset, fontSize, LIGHTGRAY);
+	const char *option = "VOLTAR";
+	DrawText(option, (GetScreenWidth() - MeasureText(option, fontSize)) / 2,  (GetScreenHeight() - fontSize) / 2 + optOffset, fontSize, WHITE);
 }
