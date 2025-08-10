@@ -39,6 +39,8 @@ int main (void)
 
     Image img_N = LoadImage("characters/corredor_EAST.png");
     Image img_A = LoadImage("characters/atirador_east.png");
+    Image explosao = LoadImage("characters/boom.png");
+
     
     while (WindowShouldClose() == false)
     {
@@ -169,7 +171,7 @@ int main (void)
         }
         
         DrawTextureV(textura_atual_player, (Vector2){personagens[0][0].hitbox.x, personagens[0][0].hitbox.y}, WHITE);
-        mover_balas(personagens, &qtd_entidades, bala_inimigo);
+        mover_balas(personagens, &qtd_entidades, bala_inimigo, explosao);
         EndDrawing();
     }
     

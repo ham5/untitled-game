@@ -22,7 +22,7 @@ void mover_player(Personagens* player);
 void atirar(Personagens *player, Image sprite);
 
 //função de mover balas
-void mover_balas(Personagens **entidades, int (*qtd_entidades)[5], Image IMAGEM_BALA);
+void mover_balas(Personagens **entidades, int (*qtd_entidades)[5], Image IMAGEM_BALA, Image imagem_explosao);
 
 //movimentação geral do boss
 void movimentacao_boss(Personagens* boss, Personagens* player, Image bala_imagem, int *timer);
@@ -53,4 +53,7 @@ void mover_inimigo (Personagens* inimigo, Personagens* player);
 
 //função para mover o atirador
 void mover_atirador (Personagens* imimigo);
+
+//função de explosão
+void explodir_corredor(Personagens personagem, Image explosao_img);
 #endif //FUNCOES_UTILIZADAS_H

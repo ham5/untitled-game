@@ -114,6 +114,14 @@ void destruir_personagem(Personagens personagem)
     UnloadTexture(personagem.sprite_E);
 }
 
+void explodir_corredor(Personagens personagem, Image explosao_img) {
+    // NÃO descarregue as texturas do personagem aqui!
+    Texture2D explosao_texture = LoadTextureFromImage(explosao_img);
+    DrawTextureV(explosao_texture, (Vector2){personagem.hitbox.x, personagem.hitbox.y}, WHITE);
+    UnloadTexture(explosao_texture);
+    // NÃO descarregue explosao_img aqui!
+}
+
 //Inicializa o jogo, setando o tamanho da tela e o FPS, e retornando o ponteiro duplo que vai conter cada tipo de personagem
 Personagens** inicializar()
 {
@@ -269,7 +277,7 @@ void atirar_dir_player(Personagens *entidade, Personagens *player, Image sprite)
 
     entidade->qtd_balas++;
 }
-void mover_balas(Personagens **entidades, int (*qtd_entidades)[5], Image IMAGEM_BALA) {
+void mover_balas(Personagens **entidades, int (*qtd_entidades)[5], Image IMAGEM_BALA, Image imagem_explosao) {
     //atualiza a posição das balas (por enquanto só do player)
     if ((*qtd_entidades)[0] > 0) { //PLAYER
         for (int i = 0; i < entidades[0][0].qtd_balas; i++) {
@@ -347,8 +355,8 @@ void mover_balas(Personagens **entidades, int (*qtd_entidades)[5], Image IMAGEM_
         }
     }  
 
-    if ((*qtd_entidades)[1] > 0) { //checador de colisão de bala player -> inimigo corredor
-        for (int i = 0; i < entidades[0][0].qtd_balas; i++) {
+    if ((*qtd_entidades)[1] > 0) { 
+        for (int i = 0; i < entidades[0][0].qtd_balas; i++) { //checador de colisão de bala player -> inimigo corredor
             for (int j = 0; j < (*qtd_entidades)[1]; j++) {
                 if (CheckCollisionRecs(entidades[0][0].balas[i].hitbox_bala, entidades[1][j].hitbox)) {
                     entidades[1][j].HP--;
@@ -370,6 +378,21 @@ void mover_balas(Personagens **entidades, int (*qtd_entidades)[5], Image IMAGEM_
                     
                     break;
                 }
+            }
+        }
+
+        for (int i = 0; i < (*qtd_entidades)[1]; i++) { //checador de colisão de inimigo corredor -> player
+            if (CheckCollisionRecs(entidades[0][0].hitbox, entidades[1][i].hitbox)) {
+                entidades[0][0].HP--;
+                //mata o inimigo
+                printf("Removendo inimigo %d\n", i);
+                destruir_personagem(entidades[1][i]);
+                for (int k = i; k < (*qtd_entidades)[1] - 1; k++) {
+                    entidades[1][k] = entidades[1][k + 1];
+                }
+                (*qtd_entidades)[1]--;
+                
+                i--;
             }
         }
     }
