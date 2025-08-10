@@ -31,9 +31,15 @@ int main (void)
     Vector2 middle_circle;
     Color blue = {0, 100, 255, 255};
     Texture2D textura_atual_player; // Variável para guardar a textura a ser desenhada do player
-    Image bala_image = LoadImage("characters/wabbit_alpha.png");
+    Image bala_player = LoadImage("characters/bullet.png");
+    Image bala_inimigo = LoadImage("characters/enemy_bullet.png");
     int cooldown = 60; // Variável para controlar o cooldown do tiro
     int timer = 0; // Timer para controlar os movimentos do boss
+    int dano_colldown = 0;
+
+    Image img_N = LoadImage("characters/corredor_EAST.png");
+    Image img_A = LoadImage("characters/atirador_east.png");
+    
     while (WindowShouldClose() == false)
     {
         cooldown++;
@@ -41,23 +47,55 @@ int main (void)
         if (time < 120 && stage_sequence == 0)
         {
             time = GetTime();
+            int time_spawn = 2;
+            if(((int)time % time_spawn == 0) && (time > 0) && (((int)time != ((int)(time - GetFrameTime()))))) // Evita spawns múltiplos no mesmo segundo
+            {
+                
+                spawnador(personagens, &qtd_entidades, img_N, img_N, img_N, img_N, 1);
+                spawnador(personagens, &qtd_entidades, img_A, img_A, img_A, img_A, 2);
+                
+            }
+            
         }
 
         //EVENT HANDLING
+        
+        //movendo o inimigo corredor
+        for(int i = 0;i<qtd_entidades[1];i++){
+            mover_inimigo(&personagens[1][i], &personagens[0][0]);
+        }
+        for(int i = 0;i<qtd_entidades[2];i++){ //move o inimigo atirador
+            mover_atirador(&personagens[2][i]);
+        }
+        if (dano_colldown > 0) dano_colldown--;
+
+        for (int i = 0; i < qtd_entidades[1]; i++) {
+            if (CheckCollisionRecs(personagens[0][0].hitbox, personagens[1][i].hitbox) && dano_colldown == 0) {
+                personagens[0][0].HP--;
+                dano_colldown = 60;
+                if(personagens[0][0].HP < 0){
+                    personagens[0][0].HP = 0;
+                    destruir_personagem(personagens[0][0]);
+                } 
+            }
+        }
+
+      
+        
         mover_player(personagens[0]);
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && cooldown >= 60)
         {
             cooldown = 0; // Reseta o cooldown
-            atirar(&personagens[0][0], bala_image);
+            atirar(&personagens[0][0], bala_player);
         }
-       
-
-        if (time >= 10 && stage_sequence == 0)
+    
+        if (time >= 120 && stage_sequence == 0)
         {
             stage_sequence = 1;
             middle_circle.x =(GetScreenWidth() / 2.0f);
             middle_circle.y = (GetScreenHeight() / 2.0f) - 5;
         }
+
         if (stage_sequence == 1 && CheckCollisionCircleRec(middle_circle, 30, personagens[0][0].hitbox))
         {
             //Lembrar de limpar todos os inimigos da tela
@@ -77,7 +115,7 @@ int main (void)
 
                 qtd_entidades[4] = 1; // Atualiza a quantidade de entidades do tipo boss
             }
-            movimentacao_boss(&personagens[4][0], &personagens[0][0], bala_image, &timer);
+            movimentacao_boss(&personagens[4][0], &personagens[0][0], bala_inimigo, &timer);
             timer++;
         }
 
@@ -100,13 +138,19 @@ int main (void)
         }
 
         BeginDrawing();
+        
         ClearBackground(WHITE);
         DrawTexture(background, 0, 0, WHITE);
+
+        // Dentro do BeginDrawing(), por exemplo, logo após desenhar o background:
+        
         switch (stage_sequence)
         {
             case 0:
             DrawText(TextFormat("%d : %02d", ((int)time) / 60, ((int)time) % 60), 10, 10, 50, WHITE);
             DrawText("MISSÃO: SOBREVIVER POR 2 MINUTOS!", 10, GetScreenHeight() - 50, 30, WHITE);
+            //desenhando inimigos
+            desenhar_inimigos(personagens, &qtd_entidades);
             break;
             case 1:
             DrawCircleV(middle_circle, 30, blue);
@@ -125,14 +169,33 @@ int main (void)
         }
         
         DrawTextureV(textura_atual_player, (Vector2){personagens[0][0].hitbox.x, personagens[0][0].hitbox.y}, WHITE);
-        mover_balas(personagens, &qtd_entidades);
+        mover_balas(personagens, &qtd_entidades, bala_inimigo);
         EndDrawing();
     }
     
     // LIMPEZA FINAL (é bom fazer uma função disso no futuro)
     destruir_personagem(personagens[0][0]);
+    if(stage_sequence==2){
+        destruir_personagem(personagens[4][0]);
+    }
     UnloadTexture(background);
-    UnloadImage(bala_image);
+    UnloadImage(bala_player);   
+   
+    for (int i = 0; i < qtd_entidades[1]; i++) {
+    destruir_personagem(personagens[1][i]);
+    }
+    for (int i = 0; i < qtd_entidades[2]; i++) {
+        destruir_personagem(personagens[2][i]);
+    }
+    for (int i = 0; i < qtd_entidades[3]; i++) {
+        destruir_personagem(personagens[3][i]);
+    }
+
+
+    for (int i = 1; i < 4; i++) {
+        if (personagens[i]) free(personagens[i]);
+    }
+
     free(personagens[0]);
     free(personagens);
     CloseWindow();

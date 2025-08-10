@@ -22,7 +22,7 @@ void mover_player(Personagens* player);
 void atirar(Personagens *player, Image sprite);
 
 //função de mover balas
-void mover_balas(Personagens **entidades, int (*qtd_entidades)[5]);
+void mover_balas(Personagens **entidades, int (*qtd_entidades)[5], Image IMAGEM_BALA);
 
 //movimentação geral do boss
 void movimentacao_boss(Personagens* boss, Personagens* player, Image bala_imagem, int *timer);
@@ -39,4 +39,18 @@ void atirar_dir_player(Personagens *entidade, Personagens *player, Image sprite)
 //função para desenhar o boss
 void desenhar_boss(Personagens *boss);
 
+//função para adicionar inimigos
+void desenhar_inimigos(Personagens** entidades, int (*qtd_entidades)[5]);
+
+//função pra peidar <- foi gustavo que fez
+void spawnador(Personagens** entidades,  int (*qtd_entidades)[5], Image IMAGEM_N, Image IMAGEM_S, Image IMAGEM_W, Image IMAGEM_E, int tipo);
+
+//função para adcionar inimigos
+void adicionar_inimigo(Personagens** entidades, int (*qtd_entidades)[5], int spawn_x, int spawn_y, int id, Image IMAGEM_N, Image IMAGEM_S, Image IMAGEM_W, Image IMAGEM_E);
+
+//função para mover os inimigos
+void mover_inimigo (Personagens* inimigo, Personagens* player);
+
+//função para mover o atirador
+void mover_atirador (Personagens* imimigo);
 #endif //FUNCOES_UTILIZADAS_H

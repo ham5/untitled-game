@@ -81,7 +81,7 @@ void movimentacao_boss(Personagens* boss, Personagens* player, Image bala_imagem
         if (*timer % 20 == 0) { //3 tiros por segundo
             atirar_dir_player(boss, player, bala_imagem);
         }
-        if (*timer % 180 == 0) {
+        if (*timer % 60 == 0) {
             for (int i = 0; i < 360; i += 30) { //tiro pra todos os lados
                 float dir_x = cosf(i * (PI / 180.0f));
                 float dir_y = sinf(i * (PI / 180.0f));
@@ -269,7 +269,7 @@ void atirar_dir_player(Personagens *entidade, Personagens *player, Image sprite)
 
     entidade->qtd_balas++;
 }
-void mover_balas(Personagens **entidades, int (*qtd_entidades)[5]) {
+void mover_balas(Personagens **entidades, int (*qtd_entidades)[5], Image IMAGEM_BALA) {
     //atualiza a posição das balas (por enquanto só do player)
     if ((*qtd_entidades)[0] > 0) { //PLAYER
         for (int i = 0; i < entidades[0][0].qtd_balas; i++) {
@@ -304,10 +304,10 @@ void mover_balas(Personagens **entidades, int (*qtd_entidades)[5]) {
                     }
                     entidades[4][0].qtd_balas--;
                     i--;
+                    
                 }
             }
         }
-
     } 
     //daí depois faz um loop para cada tipo de npc q atira
     if ((*qtd_entidades)[4] > 0) { //BOSS 
@@ -345,6 +345,268 @@ void mover_balas(Personagens **entidades, int (*qtd_entidades)[5]) {
                 }
             }
         }
-
     }  
+
+    if ((*qtd_entidades)[1] > 0) { //checador de colisão de bala player -> inimigo corredor
+        for (int i = 0; i < entidades[0][0].qtd_balas; i++) {
+            for (int j = 0; j < (*qtd_entidades)[1]; j++) {
+                if (CheckCollisionRecs(entidades[0][0].balas[i].hitbox_bala, entidades[1][j].hitbox)) {
+                    entidades[1][j].HP--;
+                    UnloadTexture(entidades[0][0].balas[i].sprite_bala);
+                    for (int k = i; k < entidades[0][0].qtd_balas - 1; k++) {
+                        entidades[0][0].balas[k] = entidades[0][0].balas[k + 1];
+                    }
+                    entidades[0][0].qtd_balas--;
+                    i--;
+                    //mata o inimigo
+                    printf("Removendo inimigo %d\n", j);
+
+                    destruir_personagem(entidades[1][j]);
+                    for (int k = j; k < (*qtd_entidades)[1] - 1; k++) {
+                        entidades[1][k] = entidades[1][k + 1];
+                    }
+                    (*qtd_entidades)[1]--;
+                    j--;
+                    
+                    break;
+                }
+            }
+        }
+    }
+
+    if ((*qtd_entidades)[2] > 0) { 
+        for (int i = 0; i < entidades[0][0].qtd_balas; i++) { //checador de colisão de bala player -> inimigo atirador
+            for (int j = 0; j < (*qtd_entidades)[2]; j++) {
+                if (CheckCollisionRecs(entidades[0][0].balas[i].hitbox_bala, entidades[2][j].hitbox)) {
+                    entidades[2][j].HP--;
+                    UnloadTexture(entidades[0][0].balas[i].sprite_bala);
+                    for (int k = i; k < entidades[0][0].qtd_balas - 1; k++) {
+                        entidades[0][0].balas[k] = entidades[0][0].balas[k + 1];
+                    }
+                    entidades[0][0].qtd_balas--;
+                    i--;
+                    //mata o inimigo
+                    printf("Removendo inimigo %d\n", j);
+
+                    destruir_personagem(entidades[2][j]);
+                    for (int k = j; k < (*qtd_entidades)[2] - 1; k++) {
+                        entidades[2][k] = entidades[2][k + 1];
+                    }
+                    (*qtd_entidades)[2]--;
+                    j--;
+                    
+                    break;
+                }
+            }
+        }
+
+        for (int i = 0; i < (*qtd_entidades)[2]; i++) { //checador de colisão de bala inimigo atirador -> player
+            for (int j = 0; j < entidades[2][i].qtd_balas; j++) {
+                if (CheckCollisionRecs(entidades[0][0].hitbox, entidades[2][i].balas[j].hitbox_bala)) {
+                    entidades[0][0].HP--;
+                    UnloadTexture(entidades[2][i].balas[j].sprite_bala);
+                    for (int k = j; k < entidades[2][i].qtd_balas - 1; k++) {
+                        entidades[2][i].balas[k] = entidades[2][i].balas[k + 1];
+                    }
+                    entidades[2][i].qtd_balas--;
+                    j--;
+                    
+                }
+            }
+        }
+
+        for (int i = 0; i < (*qtd_entidades)[2]; i++) { //faz o inimigo atirar
+            if (GetRandomValue(1, 100) <= 1) { //1% de chance de atirar a cada frame
+                atirar_dir_player(&entidades[2][i], &entidades[0][0], IMAGEM_BALA);
+            }
+        }
+
+        for (int i = 0; i < (*qtd_entidades)[2]; i++) {
+            for (int j = 0; j < entidades[2][i].qtd_balas; j++) {
+                entidades[2][i].balas[j].hitbox_bala.x += entidades[2][i].balas[j].direcao.x * 6;
+                entidades[2][i].balas[j].hitbox_bala.y += entidades[2][i].balas[j].direcao.y * 6;
+                DrawTextureV(entidades[2][i].balas[j].sprite_bala,
+                                (Vector2){entidades[2][i].balas[j].hitbox_bala.x, entidades[2][i].balas[j].hitbox_bala.y},
+                                WHITE);
+                // Remover bala se sair da tela...
+            }
+        }
+
+
+    }
+}
+
+void mover_inimigo (Personagens* inimigo, Personagens* player){
+    //definindo distancias nos eixos x e y
+    float dx = player->hitbox.x - inimigo->hitbox.x;
+    float dy = player->hitbox.y - inimigo->hitbox.y;
+    //vetor da direcao
+    float distancia = sqrt(dx*dx + dy*dy);
+    if(distancia>0){
+        dx = dx/distancia;
+        dy = dy/distancia;
+    }
+    //movimentações
+    inimigo->hitbox.x += dx * inimigo->speed;
+    inimigo->hitbox.y += dy * inimigo->speed;
+
+    if(fabs(dx)>fabs(dy)){//movimento predominante horizontal
+        if(dx>0)inimigo->sentido = 'E';
+        else inimigo->sentido = 'W';
+    }
+    else {//movimento predominante vertical
+        if(dy>0)inimigo->sentido = 'S';
+        else inimigo->sentido = 'N';
+    }
+}
+
+void mover_atirador (Personagens* imimigo) {
+    //movimenta o atirador verticalmente
+    if (imimigo->sentido == 'N') {
+        imimigo->hitbox.y -= imimigo->speed;
+        if (imimigo->hitbox.y < 0) {
+            imimigo->sentido = 'S';
+        }
+    } else if (imimigo->sentido == 'S') {
+        imimigo->hitbox.y += imimigo->speed;
+        if (imimigo->hitbox.y > GetScreenHeight() - imimigo->hitbox.height) {
+            imimigo->sentido = 'N';
+        }
+    }
+}
+
+void adicionar_inimigo(Personagens** entidades, int (*qtd_entidades)[5], int spawn_x, int spawn_y, int id, Image IMAGEM_N, Image IMAGEM_S, Image IMAGEM_W, Image IMAGEM_E)
+{
+    int index_entidade;
+    Personagens* temp = NULL;
+    temp = (Personagens*) realloc(entidades[id], ((*qtd_entidades)[id] + 1) * sizeof(Personagens));
+
+    if (temp == NULL) 
+    {
+        //erro de memoria(*qtd_entidades)[4] > 0 
+        exit(10);
+    }
+    entidades[id] = temp;
+
+    int qtd_entidade = (*qtd_entidades)[id]++;
+    switch (id) //Personagens criar_personagem(char sentido, float posicao_x, float posicao_y, Image imagem_N, Image imagem_S, Image imagem_W, Image imagem_E, int HP, int speed, int tamanho, int largura);
+    {
+    case 1:
+        entidades[id][qtd_entidade] = criar_personagem('S', spawn_x, spawn_y, IMAGEM_N, IMAGEM_S, IMAGEM_W, IMAGEM_E, 1, 2, 50, 50); //status inimigos 1
+        
+        break;
+    case 2:
+        int dado = rand() % 2; //0 ou 1
+        entidades[id][qtd_entidade] = criar_personagem(dado ? 'N': 'S', spawn_x, spawn_y, IMAGEM_N, IMAGEM_S, IMAGEM_W, IMAGEM_E, 1, 2, 50, 50); //statos inimigos 2
+
+        break;
+    }
+    
+}
+
+void spawnador(Personagens** entidades,  int (*qtd_entidades)[5], Image IMAGEM_N, Image IMAGEM_S, Image IMAGEM_W, Image IMAGEM_E, int tipo){
+    int x, y;
+    if (tipo == 1) {
+        int beirada = (rand()%4)+1; 
+        switch (beirada)
+        {
+        case 1: // esquerda
+            x = 20;
+            y = rand() % GetScreenHeight();
+            break;
+        case 2: // baixo
+            x = rand() % GetScreenWidth();
+            y = GetScreenHeight() - 50;
+            break;
+        case 3: // direita
+            x = GetScreenWidth() - 50;
+            y = rand() % GetScreenHeight();
+            break;
+        case 4: // cima
+            x = rand() % GetScreenWidth();
+            y = 0;
+            break;
+        }
+    }
+    else if (tipo == 2) {
+        //lado esquerdo ou lado direito
+        int lado = (rand() % 2) + 1; // 1 para esquerda, 2 para direita
+        if (lado == 1) {
+            x = 20; // lado esquerdo
+            y = rand() % GetScreenHeight();
+        } else {
+            x = GetScreenWidth() - 50; // lado direito
+            y = rand() % GetScreenHeight();
+        }
+    }
+    
+    adicionar_inimigo(entidades, qtd_entidades, x, y, tipo, 
+        ImageCopy(IMAGEM_N),
+        ImageCopy(IMAGEM_S),
+        ImageCopy(IMAGEM_W),
+        ImageCopy(IMAGEM_E));
+    
+}
+
+
+void desenhar_inimigos(Personagens** entidades, int (*qtd_entidades)[5]){
+    for(int i = 0;i<(*qtd_entidades)[1];i++){
+        Texture2D textura;
+        switch (entidades[1][i].sentido)
+        {
+        case 'N': 
+            textura = entidades[1][i].sprite_N;
+            break;
+        case 'S': 
+            textura = entidades[1][i].sprite_S;
+            break;
+        case 'W': 
+            textura = entidades[1][i].sprite_W;
+            break;
+        case 'E': 
+            textura = entidades[1][i].sprite_E;
+            break;
+        }
+        DrawTextureV(textura, (Vector2){entidades[1][i].hitbox.x, entidades[1][i].hitbox.y}, WHITE);
+    }
+    for(int i = 0; i<(*qtd_entidades)[2];i++){
+        Texture2D textura;
+        switch (entidades[2][i].sentido)
+        {
+       
+        case 'N': 
+            textura = entidades[2][i].sprite_N;
+            break;
+        case 'S': 
+            textura = entidades[2][i].sprite_S;
+            break;
+        case 'W': 
+            textura = entidades[2][i].sprite_W;
+            break;
+        case 'E': 
+            textura = entidades[2][i].sprite_E;
+            break;
+        }
+        DrawTextureV(textura, (Vector2){entidades[2][i].hitbox.x, entidades[2][i].hitbox.y}, WHITE);
+    }
+    for(int i = 0; i<(*qtd_entidades)[3];i++){
+        Texture2D textura;
+        switch (entidades[3][i].sentido)
+        {
+       
+        case 'N': 
+            textura = entidades[3][i].sprite_N;
+            break;
+        case 'S': 
+            textura = entidades[3][i].sprite_S;
+            break;
+        case 'W': 
+            textura = entidades[3][i].sprite_W;
+            break;
+        case 'E': 
+            textura = entidades[3][i].sprite_E;
+            break;
+        }
+        DrawTextureV(textura, (Vector2){entidades[3][i].hitbox.x, entidades[3][i].hitbox.y}, WHITE);
+    }
 }

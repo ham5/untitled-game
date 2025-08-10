@@ -26,6 +26,7 @@ typedef struct Personagens
 
     Bullet* balas; //vetor dinâmico para armazenar as balas
     int qtd_balas;
+    int cooldown;
 } Personagens;
 
 //Achei legal fazer um enum dos tipos de Personagens que vai ter, vai que pode ser útil.
