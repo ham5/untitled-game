@@ -27,22 +27,35 @@ void updateGameState(GameState *const state, const int fontSize){
 		case INIT:
 			if (clickedIn(playButtonArea, mousePosition)){ // se usuário apertou "JOGAR"
 				state->currentScreen = PLAY;
+
 			} else if (clickedIn(configButtonArea, mousePosition)){ // se usuário apertou "CONFIGURAÇÕES"
 				state->currentScreen = CONFIGURATIONS;
+
 			} else if (clickedIn(devButtonArea, mousePosition)){ // se usuário apertou "DESENVOLVEDORES"
 				state->currentScreen = DEVELOPERS;
+
 			} else if (clickedIn(exitButtonArea, mousePosition)){ // se usuário apertou "SAIR"
 				state->exit = true;
 			}
 			break;
 
 		case PLAY:
-			// em breve haverá um botão de configurações no canto superior direito da tela
+			// adicione aqui a transição da tela de jogo para a tela de vitória/derrota
 			break;
 
 		case CONFIGURATIONS:
 			if (clickedIn(audioLeftButtonArea, mousePosition) || clickedIn(audioRightButtonArea, mousePosition)){
 				state->audio = !state->audio;
+				if (state->audio == true){
+
+					// Carrega a música nova e atualiza o estado
+    				state->music = LoadMusicStream("music/menumusic.wav");
+
+					PlayMusicStream(state->music);
+				} else{
+					StopMusicStream(state->music);
+					UnloadMusicStream(state->music);
+				}
 			} else if (clickedIn(backButtonArea, mousePosition)){ // se usuário apertou "VOLTAR"
 				state->currentScreen = INIT;
 			}
@@ -85,9 +98,9 @@ void showInitScreen(const int fontSize){
 	DrawText(title, (GetScreenWidth() - MeasureText(title, titleFontSize)) / 2, (GetScreenHeight() - titleFontSize) / 2 + titleOffset, titleFontSize, WHITE);
 
 	const char *const options[] = {"JOGAR", 
-					   "CONFIGURAÇÕES",
-					   "DESENVOLVEDORES",
-					   "SAIR"};
+					   			   "CONFIGURAÇÕES",
+					               "DESENVOLVEDORES",
+					               "SAIR"};
 	for (int i = 0; i < 4; i++){
 		DrawText(options[i], (GetScreenWidth() - MeasureText(options[i], fontSize)) / 2, (GetScreenHeight() - fontSize) / 2 + optOffset, fontSize, WHITE);
 		optOffset += 50;

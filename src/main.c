@@ -21,39 +21,47 @@ int main (){
 	
 	// inicia a janela e o contexto OpenGL
 	InitWindow(screenWidth, screenHeight, "Untitled Game");
+	// inicializa o sistema de áudio
+	InitAudioDevice();
 
 	// função utilitária de resource_dir.h para encontrar a pasta de recursos e defini-la como diretório de trabalho atual, assim podemos carregar as imagens a partir dela
 	SearchAndSetResourceDir("resources");
 
-	Texture menuImage = LoadTexture("menu/menu.png");
+	Texture menuImage = LoadTexture("background/menu.png");
+
+	Music menuMusic = LoadMusicStream("music/menumusic.wav");
 
 	GameState state = {.currentScreen = INIT,
 					   .audio = true,
+					   .music = menuMusic,
 					   .exit = false };
 	int fontSize = 30;
+
+	PlayMusicStream(state.music);
 
 	// executa o loop até o usuário pressionar ESC, clicar no botão de fechar da janela ou clicar na opção SAIR
 	while (!WindowShouldClose() && !state.exit){
 
-		// ------------ desenha a tela ----------------
-		BeginDrawing();
+		if (state.audio == true) {
+        	UpdateMusicStream(state.music);
+    	}
 
+		// desenha a tela
+		BeginDrawing();
 			ClearBackground(RAYWHITE); // limpa o background
 			DrawTexture(menuImage, 0, 0, WHITE); // carrega imagem do menu
-
 			switch(state.currentScreen){
 				case INIT:
 					showInitScreen(fontSize);
 					break;
 						
 				case PLAY:
-					// rodar o jogo aqui
+					// rodar o jogo aqui (chamar a função para rodar o jogo)
 					break;
 					
-				case CONFIGURATIONS:{
+				case CONFIGURATIONS:
 					showConfigScreen(fontSize, state.audio);
 					break;
-				}
 					
 				case DEVELOPERS:
 					showDevelopScreen(fontSize);
@@ -62,16 +70,23 @@ int main (){
 				default:
 					break;
 			}
-
 		EndDrawing();
-
+		
+		// atualiza o estado da tela
 		updateGameState(&state, fontSize);
 
 	}
+
+	if (state.audio == true){
+		StopMusicStream(state.music);
+		UnloadMusicStream(state.music);
+	}
+
 	// libera a memória
 	UnloadTexture(menuImage);
-	// destrói a janela e limpa o contexto OpenGL
-	CloseWindow();
+
+	CloseAudioDevice(); // fecha o sistema de áudio
+	CloseWindow();	// destrói a janela e limpa o contexto OpenGL
 	
 	return 0;
 }

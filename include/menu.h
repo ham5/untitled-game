@@ -12,6 +12,7 @@ typedef enum{
 
 typedef struct{
 	GameScreen currentScreen;
+	Music music;
 	bool audio;
 	bool exit;
 }GameState;
