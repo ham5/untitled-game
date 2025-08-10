@@ -435,7 +435,7 @@ void tela_creditos(GameScreen *tela_atual, Texture2D imagemcreditos)
 
 void tela_morte(GameScreen *tela_atual, Texture2D mortebackground)
 {
-
+    //botoes de sair do jogo e voltar para o menu
     Rectangle menuButton = { GetScreenWidth()/2 - 125, GetScreenHeight()/2 + 90, 250, 50 };
     Rectangle exitButton = { GetScreenWidth()/2 - 125, GetScreenHeight()/2 + 160, 250, 50 };
     Vector2 mousePoint = GetMousePosition();
