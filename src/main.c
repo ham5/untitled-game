@@ -220,7 +220,7 @@ int main (){
                     atirar(&personagens[0][0], bala_player);
                 }
             
-                if (time >= 120 && stage_sequence == 0) //!!!!!!!!!!!!!!!! BOSS_TIME
+                if (time >= 12 && stage_sequence == 0) //!!!!!!!!!!!!!!!! BOSS_TIME
                 {
                     destruir_inimigos(personagens, &qtd_entidades); //destrói os inimigos
                     stage_sequence = 1;

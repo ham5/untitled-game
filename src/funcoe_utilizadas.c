@@ -138,43 +138,36 @@ Personagens** inicializar()
     return personagens;
 }
 
-// Função de mover o player (e mudar seu sentido) (intuitivo)
 void mover_player(Personagens* player)
 {
-    if (IsKeyDown(KEY_UP))
+    // UP / W
+    if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W))
     {
         player->hitbox.y -= player->speed;
-        if (player->hitbox.y <= 134)
-        {
-            player->hitbox.y = 134;
-        }
+        if (player->hitbox.y <= 134) player->hitbox.y = 134;
         player->sentido = 'N';
     }
-    if (IsKeyDown(KEY_DOWN))
+    // DOWN / S
+    if (IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S))
     {
         player->hitbox.y += player->speed;
         if (player->hitbox.y >= GetScreenHeight() - 134 - player->hitbox.height)
-        {
             player->hitbox.y = GetScreenHeight() - 134 - player->hitbox.height;
-        }
         player->sentido = 'S';
     }
-    if (IsKeyDown(KEY_LEFT))
+    // LEFT / A
+    if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A))
     {
         player->hitbox.x -= player->speed;
-        if (player->hitbox.x <= 83)
-        {
-            player->hitbox.x = 83;
-        }
+        if (player->hitbox.x <= 83) player->hitbox.x = 83;
         player->sentido = 'W';
     }
-    if (IsKeyDown(KEY_RIGHT))
+    // RIGHT / D
+    if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D))
     {
         player->hitbox.x += player->speed;
         if (player->hitbox.x >= GetScreenWidth() - 83 - player->hitbox.width)
-        {
             player->hitbox.x = GetScreenWidth() - 83 - player->hitbox.width;
-        }
         player->sentido = 'E';
     }
 }
