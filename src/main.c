@@ -7,38 +7,38 @@ by Jeffery Myers is marked with CC0 1.0. To view a copy of this license, visit h
 */
 
 #include "raylib.h"
-#include "resource_dir.h"	// biblioteca auxiliar criada para para garantir que arquivos como imagens, sons e fontes possam ser carregados corretamente, mesmo que o executável esteja em outro diretório
+#include "resource_dir.h"   // biblioteca auxiliar criada para para garantir que arquivos como imagens, sons e fontes possam ser carregados corretamente, mesmo que o executável esteja em outro diretório
 #include "funcoe_utilizadas.h" // A única inclusão necessária para suas funções
 
 #include "menu.h"
 
 int main (){
-	// informa à janela para usar V-Sync e funcionar em telas com alta densidade de pixels (HiDPI)
-	SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
+     // informa à janela para usar V-Sync e funcionar em telas com alta densidade de pixels (HiDPI)
+    SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
 
-	// define largura e altura da tela
-	const int screenWidth = 900;
-	const int screenHeight = 900;
-	
-	// inicia a janela e o contexto OpenGL
-	InitWindow(screenWidth, screenHeight, "Untitled Game");
-	// inicializa o sistema de áudio
-	InitAudioDevice();
+    // define largura e altura da tela
+    const int screenWidth = 900;
+    const int screenHeight = 900;
 
-	// função utilitária de resource_dir.h para encontrar a pasta de recursos e defini-la como diretório de trabalho atual, assim podemos carregar as imagens a partir dela
-	SearchAndSetResourceDir("resources");
+    // inicia a janela e o contexto OpenGL
+    InitWindow(screenWidth, screenHeight, "Untitled Game");
+    // inicializa o sistema de áudio
+    InitAudioDevice();
 
-	Texture menuImage = LoadTexture("background/menu.png"); //ultilizada a função criar_background na linha 62!!
+    // função utilitária de resource_dir.h para encontrar a pasta de recursos e defini-la como diretório de trabalho atual, assim podemos carregar as imagens a partir dela
+    SearchAndSetResourceDir("resources");
 
-	Music menuMusic = LoadMusicStream("music/menumusic.wav");
+    Texture menuImage = LoadTexture("background/menu.png"); //ultilizada a função criar_background na linha 62!!
 
-	GameState state = {.currentScreen = INIT,
-					   .audio = true,
-					   .music = menuMusic,
-					   .exit = false };
-	int fontSize = 30;
+    Music menuMusic = LoadMusicStream("music/menumusic.wav");
 
-	PlayMusicStream(state.music);
+    GameState state = {.currentScreen = INIT,
+                        .audio = true,
+                        .music = menuMusic,
+                        .exit = false };
+    int fontSize = 30;
+
+    PlayMusicStream(state.music);
 
     //inicialização de variáveis do jogo
     Personagens** personagens = inicializar();
@@ -55,6 +55,7 @@ int main (){
     int timer = 0; // Timer para controlar os movimentos do boss
     int dano_colldown = 0;
     double time = 0;
+    double gameStartTime = 0;
 
     Vector2 middle_circle;
     Color blue = {0, 100, 255, 255};
@@ -63,45 +64,53 @@ int main (){
     Texture2D arena_jogo = criar_background("background/Arena.png");
     Texture2D arena_boss = criar_background("background/Sala_Boss.png");
     Texture2D alternador = background; // Variável para alternar entre os backgrounds
-    
+        
     Image bala_player = LoadImage("characters/bullet.png");
     Image bala_inimigo = LoadImage("characters/enemy_bullet.png");
     Image img_N = LoadImage("characters/corredor_EAST.png");
     Image img_A = LoadImage("characters/atirador_east.png");
     Image explosao = LoadImage("characters/boom.png");
 
-	// executa o loop até o usuário pressionar ESC, clicar no botão de fechar da janela ou clicar na opção SAIR
-	while (!WindowShouldClose() && !state.exit){
+    while (!WindowShouldClose() && !state.exit){
 
-		if (state.audio == true) {
-        	UpdateMusicStream(state.music);
-    	}
+        if (state.audio == true) {
+            UpdateMusicStream(state.music);
+        }
 
-		// desenha a tela
-		BeginDrawing();
+        BeginDrawing();
         ClearBackground(RAYWHITE); // limpa o background
         DrawTexture(alternador, 0, 0, WHITE); // carrega imagem do menu
-        
+
         switch(state.currentScreen){
             case INIT:
                 alternador = background;
                 showInitScreen(fontSize);
-                break;
-                    
+                gameStartTime = 0; 
+                break;   
             case PLAY: // rodar o jogo aqui (chamar a função para rodar o jogo)
-            cooldown++;
-            //TEMPO
+                //TEMPO
+                if (gameStartTime == 0)
+                {
+                    gameStartTime = GetTime(); // Captura o tempo inicial uma única vez
+                }
+
+                time = GetTime() - gameStartTime; // Calcula o tempo decorrido no jogo
+
+                cooldown++;
                 if (time < 120 && stage_sequence == 0)
                 {
                     alternador = arena_jogo;
-                    time = GetTime();
                     int time_spawn = 2;
                     if(((int)time % time_spawn == 0) && (time > 0) && (((int)time != ((int)(time - GetFrameTime()))))) // Evita spawns múltiplos no mesmo segundo
                     {
-                        
-                        spawnador(personagens, &qtd_entidades, img_N, img_N, img_N, img_N, 1);
-                        spawnador(personagens, &qtd_entidades, img_A, img_A, img_A, img_A, 2);
-                        
+                        if (qtd_entidades[1] + qtd_entidades[2] < 8)
+                        {
+                            spawnador(personagens, &qtd_entidades, img_N, img_N, img_N, img_N, 1);
+                        }
+                        if (qtd_entidades[1] + qtd_entidades[2] < 8)
+                        {
+                            spawnador(personagens, &qtd_entidades, img_A, img_A, img_A, img_A, 2);
+                        }
                     }
                     
                 }
@@ -134,7 +143,7 @@ int main (){
                     atirar(&personagens[0][0], bala_player);
                 }
             
-                if (time >= 10 && stage_sequence == 0)
+                if (time >= 120 && stage_sequence == 0)
                 {
                     destruir_inimigos(personagens, &qtd_entidades); //destrói os inimigos
                     stage_sequence = 1;
@@ -160,7 +169,8 @@ int main (){
 
                         qtd_entidades[4] = 1; // Atualiza a quantidade de entidades do tipo boss
                     }
-                    movimentacao_boss(&personagens[4][0], &personagens[0][0], bala_inimigo, &timer);
+                    
+                    movimentacao_boss(&personagens[4][0], &personagens[0][0], bala_inimigo, &timer, personagens, &qtd_entidades, img_N, img_A);
                     timer++;
 
                     if (personagens[4][0].HP <= 1) { //trigger para começar a spawnar bixo
@@ -219,11 +229,13 @@ int main (){
             case CONFIGURATIONS:
                 alternador = background;
                 showConfigScreen(fontSize, state.audio);
+                gameStartTime = 0;
                 break;
                 
             case DEVELOPERS:
                 alternador = background;
                 showDevelopScreen(fontSize);
+                gameStartTime = 0;
                 break;
             
             default:

@@ -25,7 +25,7 @@ void atirar(Personagens *player, Image sprite);
 void mover_balas(Personagens **entidades, int (*qtd_entidades)[5], Image IMAGEM_BALA, Image imagem_explosao);
 
 //movimentação geral do boss
-void movimentacao_boss(Personagens* boss, Personagens* player, Image bala_imagem, int *timer);
+void movimentacao_boss(Personagens* boss, Personagens* player, Image bala_imagem, int *timer, Personagens** personagens, int (*qtd_entidades)[5], Image img_corredor, Image img_atirador);
 
 //cria o boss
 Personagens criar_boss(char sentido, float posicao_x, float posicao_y, Image imagem_N, Image imagem_S, Image imagem_W, Image imagem_E);
