@@ -176,7 +176,7 @@ int main (){
                     timer++;
 
                     if (personagens[4][0].HP <= 1) { //trigger para começar a spawnar bixo
-                        if (timer % 180 == 0) { // A cada 3 segundos
+                        if (timer % 180 == 0 && (qtd_entidades[1] + qtd_entidades[2]) < 3) { // A cada 3 segundos
                             spawnador(personagens, &qtd_entidades, img_A, img_A, img_A, img_A, 2);
                         }
                     }

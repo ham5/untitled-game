@@ -91,19 +91,6 @@ void movimentacao_boss(Personagens* boss, Personagens* player, Image bala_imagem
             }
         }
 
-        if (boss->HP == 1) 
-        { //fase 3 (mantém os ataques da fase 2)
-        if (*timer % 120 == 0) { // Spawna inimigos a cada 2 segundos
-            if ((*qtd_entidades)[1] + (*qtd_entidades)[2] < 8) {
-                int tipo_inimigo = 1 + rand() % 2;
-                if (tipo_inimigo == 1) {
-                    spawnador(personagens, qtd_entidades, img_corredor, img_corredor, img_corredor, img_corredor, 1);
-                } else {
-                    spawnador(personagens, qtd_entidades, img_atirador, img_atirador, img_atirador, img_atirador, 2);
-                }
-            }
-        }
-        }
     }
 }
 //Cria o background da tela
