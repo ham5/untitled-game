@@ -14,6 +14,7 @@ typedef struct{
 	GameScreen currentScreen;
 	Music music;
 	bool audio;
+	int score;
 	bool exit;
 }GameState;
 

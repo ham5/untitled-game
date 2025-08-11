@@ -2,6 +2,7 @@
 #define FUNCOES_UTILIZADAS_H
 
 #include "structs_e_enums_utilizadas.h"
+#include "menu.h"
 
 //Cria um personagem e atribui suas caracteristicas
 Personagens criar_personagem(char sentido, float posicao_x, float posicao_y, Image imagem_N, Image imagem_S, Image imagem_W, Image imagem_E, int HP, int speed, int tamanho, int largura);
@@ -22,7 +23,7 @@ void mover_player(Personagens* player);
 void atirar(Personagens *player, Image sprite);
 
 //função de mover balas
-void mover_balas(Personagens **entidades, int (*qtd_entidades)[5], Image IMAGEM_BALA, Image imagem_explosao);
+void mover_balas(Personagens **entidades, int (*qtd_entidades)[5], GameState *state, Image IMAGEM_BALA, Image imagem_explosao);
 
 //movimentação geral do boss
 void movimentacao_boss(Personagens* boss, Personagens* player, Image bala_imagem, int *timer, Personagens** personagens, int (*qtd_entidades)[5], Image img_corredor, Image img_atirador);
@@ -62,4 +63,7 @@ void destruir_inimigos(Personagens** entidades, int (*qtd_entidades)[5]);
 
 //função para fim de jogo
 void destruir_inimigos_e_boss(Personagens** entidades, int (*qtd_entidades)[5]);
+
+//função para desenhar o score
+void desenhar_score(int score);
 #endif //FUNCOES_UTILIZADAS_H

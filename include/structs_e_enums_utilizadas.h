@@ -39,12 +39,4 @@ enum Tipo_Personagem
     Boss
 };
 
-// Estrutura para a animação de morte do inimigo
-typedef struct EfeitoMorte {
-    Vector2 posicao;
-    int frame_timer; // Contador de frames para a duração da animação
-    bool ativo;      // Indica se a animação está em andamento
-} EfeitoMorte;
-
-
 #endif //STRUCTS_E_ENUMS_UTILIZADAS_H

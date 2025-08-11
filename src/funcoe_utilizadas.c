@@ -1,4 +1,5 @@
 #include "funcoe_utilizadas.h" // Inclui o cabeçalho com as declarações
+#include "menu.h"
 #include <math.h>
 
 //Cria um personagem e atribui suas caracteristicas
@@ -278,7 +279,7 @@ void atirar_dir_player(Personagens *entidade, Personagens *player, Image sprite)
 
     entidade->qtd_balas++;
 }
-void mover_balas(Personagens **entidades, int (*qtd_entidades)[5], Image IMAGEM_BALA, Image imagem_explosao) {
+void mover_balas(Personagens **entidades, int (*qtd_entidades)[5], GameState *state, Image IMAGEM_BALA, Image imagem_explosao) {
     //atualiza a posição das balas (por enquanto só do player)
     if ((*qtd_entidades)[0] > 0) { //PLAYER
         for (int i = 0; i < entidades[0][0].qtd_balas; i++) {
@@ -368,6 +369,7 @@ void mover_balas(Personagens **entidades, int (*qtd_entidades)[5], Image IMAGEM_
                     entidades[0][0].qtd_balas--;
                     i--;
                     //mata o inimigo
+                    state->score += 10;
                     printf("Removendo inimigo %d\n", j);
 
                     destruir_personagem(entidades[1][j]);
@@ -410,6 +412,7 @@ void mover_balas(Personagens **entidades, int (*qtd_entidades)[5], Image IMAGEM_
                     entidades[0][0].qtd_balas--;
                     i--;
                     //mata o inimigo
+                    state->score += 15;
                     printf("Removendo inimigo %d\n", j);
 
                     destruir_personagem(entidades[2][j]);
@@ -655,4 +658,13 @@ void destruir_inimigos_e_boss(Personagens** entidades, int (*qtd_entidades)[5]) 
         entidades[i] = (Personagens*)malloc(sizeof(Personagens)); // realoca para evitar crash
         (*qtd_entidades)[i] = 0; // zera a quantidade
     }
+}
+
+void desenhar_score(int score)
+{
+    char scoreText[20];
+    sprintf(scoreText, "Score: %d", score);
+    int fontSize = 30;
+    int textWidth = MeasureText(scoreText, fontSize);
+    DrawText(scoreText, GetScreenWidth() - textWidth - 20, 20, fontSize, WHITE);
 }

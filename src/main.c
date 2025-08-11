@@ -35,6 +35,7 @@ int main (){
     GameState state = {.currentScreen = INIT,
                         .audio = true,
                         .music = menuMusic,
+                        .score = 0,
                         .exit = false };
     int fontSize = 30;
 
@@ -86,6 +87,7 @@ int main (){
                 alternador = background;
                 showInitScreen(fontSize);
                 gameStartTime = 0; 
+                state.score = 0;
                 break;   
             case PLAY: // rodar o jogo aqui (chamar a função para rodar o jogo)
                 //TEMPO
@@ -219,23 +221,27 @@ int main (){
                     desenhar_boss(&personagens[4][0]);
                     desenhar_inimigos(personagens, &qtd_entidades);
 
+
                     break;
                 }
                 
                 DrawTextureV(textura_atual_player, (Vector2){personagens[0][0].hitbox.x, personagens[0][0].hitbox.y}, WHITE);
-                mover_balas(personagens, &qtd_entidades, bala_inimigo, explosao);
+                desenhar_score(state.score);
+                mover_balas(personagens, &qtd_entidades, &state ,bala_inimigo, explosao);
                 break;
                 
             case CONFIGURATIONS:
                 alternador = background;
                 showConfigScreen(fontSize, state.audio);
                 gameStartTime = 0;
+                state.score = 0;
                 break;
                 
             case DEVELOPERS:
                 alternador = background;
                 showDevelopScreen(fontSize);
                 gameStartTime = 0;
+                state.score = 0;
                 break;
             
             default:
