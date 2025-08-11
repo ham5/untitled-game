@@ -1,0 +1,1 @@
+cd "/mnt/d/C_Projects/Projeto_P.I _2.0/untitled-game2" && make clean && make && ./build/untitled-game2
