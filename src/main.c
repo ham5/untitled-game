@@ -1,4 +1,4 @@
-#include "funcoe_utilizadas.h" // A única inclusão necessária para suas funções
+#include "funcoe_utilizadas.h" // A única inclusão necessária para todas as funções
 #include "resource_dir.h"
 
 int main (void)
@@ -27,7 +27,7 @@ int main (void)
     if (hp_frame.id != 0) SetTextureFilter(hp_frame, TEXTURE_FILTER_BILINEAR);
 
     // ===== HUD HP (BOSS): CARREGAR UMA VEZ =====
-    // >>> COLOQUE AQUI O CAMINHO DA PNG DO BOSS (fill) <<<
+    // >>> COLOQUE AQUI O CAMINHO DA PNG DO BOSS <<<
     Texture2D boss_hp_fill = LoadTexture("hud/fullBOSSHPBAR.png");
     Texture2D boss_hp_frame = (Texture2D){0}; // opcional (moldura)
 

@@ -445,7 +445,7 @@ void desenhar_barra_hp(const Personagens* player, int max_hp,
     if (ratio < 0.0f) ratio = 0.0f;
     if (ratio > 1.0f) ratio = 1.0f;
 
-    // usa a área útil recebida (sem cache global)
+    // usa a área útil recebida
     Rectangle srcArea = src_area;
 
     int drawW = (int)(srcArea.width  * scale);
@@ -455,23 +455,28 @@ void desenhar_barra_hp(const Personagens* player, int max_hp,
     float x = (pos.x < 0.0f) ? (GetScreenWidth() - drawW) * 0.5f : pos.x;
     float y = pos.y;
 
-    // fundo preto opaco + “soft edges” só na área útil
-    Rectangle bg = { x, y, (float)drawW, (float)drawH };
-    DrawRectangleRec(bg, Fade(BLACK, 0.85f));
-    DrawRectangleRec((Rectangle){ bg.x - 1, bg.y - 1, bg.width + 2, bg.height + 2 }, Fade(BLACK, 0.35f));
-    DrawRectangleRec((Rectangle){ bg.x - 2, bg.y - 2, bg.width + 4, bg.height + 4 }, Fade(BLACK, 0.15f));
+     // === FUNDO "VIDRO FOSCO" (substitui o bloco preto antigo) ===
+    const Color GLASS = (Color){ 200, 205, 215, 255 }; // tom de vidro
+    Rectangle bg = (Rectangle){ x, y, (float)drawW, (float)drawH };
+
+    DrawRectangleRec(bg, Fade(GLASS, 0.40f)); // painel principal translúcido
+    DrawRectangleRec((Rectangle){ bg.x - 1, bg.y - 1, bg.width + 2, bg.height + 2 }, Fade(GLASS, 0.22f));
+    DrawRectangleRec((Rectangle){ bg.x - 3, bg.y - 3, bg.width + 6, bg.height + 6 }, Fade(GLASS, 0.10f));
+
+    // brilho topo + sombra base (opcional)
+    DrawRectangle((int)bg.x, (int)bg.y, (int)bg.width, 1, Fade(WHITE, 0.35f));
+    DrawRectangle((int)bg.x, (int)(bg.y + bg.height - 1), (int)bg.width, 1, Fade(BLACK, 0.20f));
+    // === FIM DO FUNDO ===
 
     // parte cheia proporcional
-    Rectangle srcClip = srcArea;
-    srcClip.width = srcArea.width * ratio;
-
-    Rectangle dst = { x, y, srcClip.width * scale, drawH };
+    Rectangle srcClip = srcArea; srcClip.width = srcArea.width * ratio;
+    Rectangle dst = (Rectangle){ x, y, srcClip.width * scale, (float)drawH };
     DrawTexturePro(barra_fill, srcClip, dst, (Vector2){0,0}, 0.0f, WHITE);
 
-    // moldura por cima (se houver)
+    // moldura, se houver
     if (barra_frame.id != 0)
     {
-        Rectangle dstFrame = { x, y, srcArea.width * scale, drawH };
+        Rectangle dstFrame = (Rectangle){ x, y, srcArea.width * scale, (float)drawH };
         DrawTexturePro(barra_frame, srcArea, dstFrame, (Vector2){0,0}, 0.0f, WHITE);
     }
 }
@@ -489,7 +494,6 @@ void desenhar_barra_boss(const Personagens* boss, int max_hp,
     if (ratio < 0.0f) ratio = 0.0f;
     if (ratio > 1.0f) ratio = 1.0f;
 
-    // usa a área útil recebida (sem cache global)
     Rectangle srcArea = src_area;
 
     int drawW = (int)(GetScreenWidth() - 2.0f * margem_lateral);
@@ -498,20 +502,27 @@ void desenhar_barra_boss(const Personagens* boss, int max_hp,
     float x = margem_lateral;
     float y = GetScreenHeight() - margem_inferior - drawH;
 
-    // fundo preto opaco + “soft edges”
-    Rectangle bg = { x, y, (float)drawW, (float)drawH };
-    DrawRectangleRec(bg, Fade(BLACK, 0.85f));
-    DrawRectangleRec((Rectangle){ bg.x - 1, bg.y - 1, bg.width + 2, bg.height + 2 }, Fade(BLACK, 0.35f));
-    DrawRectangleRec((Rectangle){ bg.x - 2, bg.y - 2, bg.width + 4, bg.height + 4 }, Fade(BLACK, 0.15f));
+    // === FUNDO "VIDRO FOSCO" (substitui o bloco preto antigo) ===
+    const Color GLASS = (Color){ 200, 205, 215, 255 };
+    Rectangle bg = (Rectangle){ x, y, (float)drawW, (float)drawH };
+
+    DrawRectangleRec(bg, Fade(GLASS, 0.40f));
+    DrawRectangleRec((Rectangle){ bg.x - 1, bg.y - 1, bg.width + 2, bg.height + 2 }, Fade(GLASS, 0.22f));
+    DrawRectangleRec((Rectangle){ bg.x - 3, bg.y - 3, bg.width + 6, bg.height + 6 }, Fade(GLASS, 0.10f));
+
+    // brilho topo + sombra base (opcional)
+    DrawRectangle((int)bg.x, (int)bg.y, (int)bg.width, 1, Fade(WHITE, 0.35f));
+    DrawRectangle((int)bg.x, (int)(bg.y + bg.height - 1), (int)bg.width, 1, Fade(BLACK, 0.20f));
+    // === FIM DO FUNDO ===
 
     // parte cheia proporcional (esticada)
-    Rectangle dst = { x, y, drawW * ratio, (float)drawH };
+    Rectangle dst = (Rectangle){ x, y, drawW * ratio, (float)drawH };
     DrawTexturePro(barra_fill, srcArea, dst, (Vector2){0,0}, 0.0f, WHITE);
 
-    // moldura (se houver)
+    // moldura, se houver
     if (barra_frame.id != 0)
     {
-        Rectangle dstFrame = { x, y, (float)drawW, (float)drawH };
+        Rectangle dstFrame = (Rectangle){ x, y, (float)drawW, (float)drawH };
         DrawTexturePro(barra_frame, srcArea, dstFrame, (Vector2){0,0}, 0.0f, WHITE);
     }
 }

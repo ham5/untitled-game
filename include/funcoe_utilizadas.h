@@ -42,9 +42,8 @@ void atirar_dir_player(Personagens *entidade, Personagens *player, Image sprite)
 // desenhar boss
 void desenhar_boss(Personagens *boss);
 
-/* ================= HUD ================= */
-// Detecta, em uma textura de barra, a área útil (região vermelha) a partir do
-// conteúdo dos pixels.
+// ================= HUD =================
+// Detecta, em uma textura de barra, a área útil (região vermelha) a partir do conteúdo dos pixels.
 Rectangle detectar_area_hp(Texture2D tex);
 
 // Barra de HP comum (player). Se pos.x < 0, centraliza automaticamente pela área útil.
