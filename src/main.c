@@ -91,8 +91,9 @@ int main (void)
             atirar(&personagens[0][0], bala_player);
         }
     
-        if (time >= 120 && stage_sequence == 0)
+        if (time >= 10 && stage_sequence == 0)
         {
+            destruir_inimigos(personagens, &qtd_entidades); //destrói os inimigos
             stage_sequence = 1;
             middle_circle.x =(GetScreenWidth() / 2.0f);
             middle_circle.y = (GetScreenHeight() / 2.0f) - 5;
@@ -108,17 +109,23 @@ int main (void)
         }
         if (stage_sequence == 2)
         {
-            if (timer == 0) { //cria o boss
+            if (timer == 0) { //cria o boss e destrói os inimigos
                 personagens[4][0] = criar_boss('S', (GetScreenWidth() / 2), (GetScreenHeight() / 2) + 70,
-                                        LoadImage("characters/Robo_Gladiador_NORTH.png"),
-                                        LoadImage("characters/Robo_Gladiador_SOUTH.png"),
-                                        LoadImage("characters/Robo_Gladiador_WEST.png"),
-                                        LoadImage("characters/Robo_Gladiador_EAST.png"));
+                                        LoadImage("characters/BOSS.png"),
+                                        LoadImage("characters/BOSS.png"),
+                                        LoadImage("characters/BOSS.png"),
+                                        LoadImage("characters/BOSS.png"));
 
                 qtd_entidades[4] = 1; // Atualiza a quantidade de entidades do tipo boss
             }
             movimentacao_boss(&personagens[4][0], &personagens[0][0], bala_inimigo, &timer);
             timer++;
+
+            if (personagens[4][0].HP <= 1) { //trigger para começar a spawnar bixo
+                if (timer % 180 == 0) { // A cada 3 segundos
+                    spawnador(personagens, &qtd_entidades, img_A, img_A, img_A, img_A, 2);
+                }
+            }
         }
 
         // DRAWING
@@ -161,11 +168,11 @@ int main (void)
             case 2:
             if (personagens[0][0].HP == 0) {
                 DrawText("MORREU ZÉ", 10, GetScreenHeight() - 50, 30, WHITE); //só p testar
-                background = criar_background("background/foxe.png");
             }else {
                 DrawText("MISSÃO: DERROTE O BOSS!", 10, GetScreenHeight() - 50, 30, WHITE);
             }
             desenhar_boss(&personagens[4][0]);
+            desenhar_inimigos(personagens, &qtd_entidades);
 
             break;
         }

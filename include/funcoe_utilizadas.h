@@ -56,4 +56,10 @@ void mover_atirador (Personagens* imimigo);
 
 //função de explosão
 void explodir_corredor(Personagens personagem, Image explosao_img);
+
+//função para destruir os inimigos
+void destruir_inimigos(Personagens** entidades, int (*qtd_entidades)[5]);
+
+//função para fim de jogo
+void destruir_inimigos_e_boss(Personagens** entidades, int (*qtd_entidades)[5]);
 #endif //FUNCOES_UTILIZADAS_H

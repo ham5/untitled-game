@@ -78,6 +78,7 @@ void movimentacao_boss(Personagens* boss, Personagens* player, Image bala_imagem
     }
 
     if (boss->HP <= 2) { //fase 2
+        boss->speed = 1;
         if (*timer % 20 == 0) { //3 tiros por segundo
             atirar_dir_player(boss, player, bala_imagem);
         }
@@ -112,14 +113,6 @@ void destruir_personagem(Personagens personagem)
     UnloadTexture(personagem.sprite_S);
     UnloadTexture(personagem.sprite_W);
     UnloadTexture(personagem.sprite_E);
-}
-
-void explodir_corredor(Personagens personagem, Image explosao_img) {
-    // NÃO descarregue as texturas do personagem aqui!
-    Texture2D explosao_texture = LoadTextureFromImage(explosao_img);
-    DrawTextureV(explosao_texture, (Vector2){personagem.hitbox.x, personagem.hitbox.y}, WHITE);
-    UnloadTexture(explosao_texture);
-    // NÃO descarregue explosao_img aqui!
 }
 
 //Inicializa o jogo, setando o tamanho da tela e o FPS, e retornando o ponteiro duplo que vai conter cada tipo de personagem
@@ -631,5 +624,27 @@ void desenhar_inimigos(Personagens** entidades, int (*qtd_entidades)[5]){
             break;
         }
         DrawTextureV(textura, (Vector2){entidades[3][i].hitbox.x, entidades[3][i].hitbox.y}, WHITE);
+    }
+}
+
+void destruir_inimigos(Personagens** entidades, int (*qtd_entidades)[5]) {
+    for (int i = 1; i < 4; i++) {
+        for (int j = 0; j < (*qtd_entidades)[i]; j++) {
+            destruir_personagem(entidades[i][j]);
+        }
+        free(entidades[i]);
+        entidades[i] = (Personagens*)malloc(sizeof(Personagens)); // realoca para evitar crash
+        (*qtd_entidades)[i] = 0; // zera a quantidade
+    }
+}
+
+void destruir_inimigos_e_boss(Personagens** entidades, int (*qtd_entidades)[5]) {
+    for (int i = 1; i < 5; i++) {
+        for (int j = 0; j < (*qtd_entidades)[i]; j++) {
+            destruir_personagem(entidades[i][j]);
+        }
+        free(entidades[i]);
+        entidades[i] = (Personagens*)malloc(sizeof(Personagens)); // realoca para evitar crash
+        (*qtd_entidades)[i] = 0; // zera a quantidade
     }
 }
