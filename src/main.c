@@ -1,13 +1,5 @@
-/*
-Raylib example file.
-This is an example main file for a simple raylib project.
-Use this as a starting point or replace it with your code.
-
-by Jeffery Myers is marked with CC0 1.0. To view a copy of this license, visit https://creativecommons.org/publicdomain/zero/1.0/
-*/
-
 #include "raylib.h"
-#include "resource_dir.h"   // biblioteca auxiliar criada para para garantir que arquivos como imagens, sons e fontes possam ser carregados corretamente, mesmo que o executável esteja em outro diretório
+#include "resource_dir.h"  // biblioteca auxiliar criada para para garantir que arquivos como imagens, sons e fontes possam ser carregados corretamente, mesmo que o executável esteja em outro diretório
 #include "funcoe_utilizadas.h" // A única inclusão necessária para suas funções
 
 #include "menu.h"
@@ -27,19 +19,22 @@ int main (){
 
     // função utilitária de resource_dir.h para encontrar a pasta de recursos e defini-la como diretório de trabalho atual, assim podemos carregar as imagens a partir dela
     SearchAndSetResourceDir("resources");
+    float volume = 1.0;
+    SetMasterVolume(volume);
 
     Texture menuImage = LoadTexture("background/menu.png"); //ultilizada a função criar_background na linha 62!!
 
-    Music menuMusic = LoadMusicStream("music/menumusic.wav");
+    Music bossmusic = LoadMusicStream("music/bossmusic.wav");
+    Music salainimigo = LoadMusicStream("music/salainimigo.wav");
+    Music menumusic = LoadMusicStream("music/menumusic.wav");
+    Music victorymusic = LoadMusicStream("music/victory.wav");
 
     GameState state = {.currentScreen = INIT,
-                        .audio = true,
-                        .music = menuMusic,
                         .score = 0,
                         .exit = false };
     int fontSize = 30;
 
-    PlayMusicStream(state.music);
+    PlayMusicStream(menumusic);
 
     //inicialização de variáveis do jogo
     Personagens** personagens = inicializar();
@@ -57,7 +52,7 @@ int main (){
     int dano_colldown = 0;
     double time = 0;
     double gameStartTime = 0;
-
+    bool gameplayiniciada = false;
 
      // ===== HUD HP (PLAYER): CARREGAR UMA VEZ =====  Parte 1
     // >>> COLOQUE AQUI O CAMINHO DA PNG DO PLAYER (fill) <<<
@@ -103,19 +98,15 @@ int main (){
     int   boss_max_hp          = 0;      // define quando o boss nasce
     //============================================================
 
-
-
-
-
-
-
-
     Vector2 middle_circle;
     Color blue = {0, 100, 255, 255};
     Texture2D textura_atual_player; // Variável para guardar a textura a ser desenhada do player
     Texture2D background = criar_background("background/menu.png");
     Texture2D arena_jogo = criar_background("background/Arena.png");
     Texture2D arena_boss = criar_background("background/Sala_Boss.png");
+    Texture2D vitoriabackground = criar_background("background/vitoria.png");
+    Texture2D derrotainimigosbackground = criar_background("background/sobrou_nada.png");
+    Texture2D derrotabossbackground = criar_background("background/soubrou_absolutamente_nada.png");
     Texture2D alternador = background; // Variável para alternar entre os backgrounds
         
     Image bala_player = LoadImage("characters/bullet.png");
@@ -130,9 +121,18 @@ int main (){
     //Gameplay loop
     while (!WindowShouldClose() && !state.exit){
 
-        if (state.audio == true) {
-            UpdateMusicStream(state.music);
-        }
+        if(state.currentScreen == PLAY){
+            if(stage_sequence < 1){
+                UpdateMusicStream(salainimigo);
+            }
+            else { // stage_sequence == 2
+                UpdateMusicStream(bossmusic);
+            }
+        } else if(state.currentScreen  == VICTORY){
+            UpdateMusicStream(victorymusic);
+        } else { // Se não for gameplay, é menu
+            UpdateMusicStream(menumusic);
+        } 
 
         BeginDrawing();
         ClearBackground(RAYWHITE); // limpa o background
@@ -140,8 +140,21 @@ int main (){
 
         switch(state.currentScreen){
             case INIT:
+                if(IsMusicStreamPlaying(victorymusic)){
+                    StopMusicStream(victorymusic);
+                }
+
+                if (gameplayiniciada == true)
+                {
+                    destruir_personagem(personagens[0][0]);
+                    if(stage_sequence == 2){
+                        destruir_personagem(personagens[4][0]);
+                    }
+                    PlayMusicStream(menumusic);
+                    gameplayiniciada = false;
+                }
                 alternador = background;
-                showInitScreen(fontSize);
+                showInitScreen(&state);
                 gameStartTime = 0; 
                 state.score = 0;
                 break;   
@@ -160,10 +173,28 @@ int main (){
                 //============================================================
 
 
+                if (gameplayiniciada == false) //condição inicial que reinicia os timers e troca a musica 
+                {
+                    stage_sequence = 0;
+                    time = 0;
+                    timer = 0;
+                    StopMusicStream(menumusic);
+                    PlayMusicStream(salainimigo);
 
-
-
-
+                    personagens[0][0] = criar_personagem('E', (GetScreenWidth() / 2) - 25, (GetScreenHeight() / 2) - 50, 
+                                        LoadImage("characters/Robo_Gladiador_NORTH.png"),
+                                        LoadImage("characters/Robo_Gladiador_SOUTH.png"),
+                                        LoadImage("characters/Robo_Gladiador_WEST.png"),
+                                        LoadImage("characters/Robo_Gladiador_EAST.png"), 
+                                        10, 3, 50, 50);
+                    
+                    for (int i = 0; i < 5; i++)
+                    {
+                        qtd_entidades[i] = 0; // zera a contagem de todos os personagens
+                    }
+                    
+                    gameplayiniciada = true;
+                }
 
                 //TEMPO
                 if (gameStartTime == 0)
@@ -226,11 +257,13 @@ int main (){
                     stage_sequence = 1;
                     middle_circle.x =(GetScreenWidth() / 2.0f);
                     middle_circle.y = (GetScreenHeight() / 2.0f) - 5;
+                    StopMusicStream(salainimigo);
                 }
 
                 if (stage_sequence == 1 && CheckCollisionCircleRec(middle_circle, 30, personagens[0][0].hitbox))
                 {
                     //Lembrar de limpar todos os inimigos da tela
+                    PlayMusicStream(bossmusic);
                     stage_sequence = 2;
                     alternador = arena_boss;
                     time = 0;
@@ -248,21 +281,6 @@ int main (){
                         boss_max_hp = personagens[4][0].HP;   // ***********
 
                         if (boss_max_hp <= 0) boss_max_hp = 1;
-
-
-                        /*
-                        //============================================================ HUD
-                        // ===== HUD: BARRA DE HP DO BOSS (rodapé, esticada) =====
-                        
-                        desenhar_barra_boss(&personagens[4][0], boss_max_hp,
-                        boss_hp_fill, boss_hp_frame,
-                        boss_hp_margin_x, boss_hp_margin_bottom,
-                        boss_hp_height_scale,
-                        boss_src_area);
-                        
-                        //============================================================
-                        */
-                       
 
                     }
                     
@@ -339,9 +357,14 @@ int main (){
                 hp_src_area);
                 //============================================================
 
+                
+                if(personagens[0][0].HP == 0){ //condição para o jogador perder e ir para a tela de derrota 
+                    state.currentScreen = DEFEAT;
+                }
 
-
-
+                if(stage_sequence == 2 && personagens[4][0].HP == 0){ //condição para o jogador ganhar e ir para a tela de vitoria 
+                    state.currentScreen = VICTORY;
+                }
 
 
                 DrawTextureV(textura_atual_player, (Vector2){personagens[0][0].hitbox.x, personagens[0][0].hitbox.y}, WHITE);
@@ -351,31 +374,48 @@ int main (){
                 
             case CONFIGURATIONS:
                 alternador = background;
-                showConfigScreen(fontSize, state.audio);
+                showConfigScreen(&state, &volume);
                 gameStartTime = 0;
                 state.score = 0;
                 break;
                 
             case DEVELOPERS:
                 alternador = background;
-                showDevelopScreen(fontSize);
+                showDevelopScreen(&state);
                 gameStartTime = 0;
                 state.score = 0;
                 break;
             
+            case VICTORY:
+                if(IsMusicStreamPlaying(bossmusic)){
+                    StopMusicStream(bossmusic);
+                    PlayMusicStream(victorymusic);
+                } 
+
+                alternador = vitoriabackground;
+                showVictoryScreen(&state);
+                gameStartTime = 0;
+                state.score = 0;
+			    break;
+		    case DEFEAT:
+                if(IsMusicStreamPlaying(bossmusic)) StopMusicStream(bossmusic);
+                if(IsMusicStreamPlaying(salainimigo)) StopMusicStream(salainimigo);
+
+                if(stage_sequence == 2){
+                    alternador = derrotabossbackground;
+                } else {
+                    alternador = derrotainimigosbackground;
+                }
+
+                showGameoverScreen(&state);
+                gameStartTime = 0;
+                state.score = 0;
+			    break;
             default:
                 break;
 			}
 		EndDrawing();
-		
-		// atualiza o estado da tela
-		updateGameState(&state, fontSize);
 
-	}
-
-	if (state.audio == true){
-		StopMusicStream(state.music);
-		UnloadMusicStream(state.music);
 	}
 
 	// libera a memória

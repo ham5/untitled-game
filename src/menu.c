@@ -8,130 +8,104 @@ bool clickedIn(const Rectangle ButtonArea, const Vector2 mousePosition){
 	return false;
 }
 
-void updateGameState(GameState *const state, const int fontSize){
+void showInitScreen(GameState *const state){
+	// Áreas base dos botões
+    Rectangle playButton = { GetScreenWidth()/2 - 125, GetScreenHeight()/2 - 50, 250, 50 };
+    Rectangle optionsButton = { GetScreenWidth()/2 - 125, GetScreenHeight()/2 + 20, 250, 50 };
+    Rectangle creditsButton = { GetScreenWidth()/2 - 125, GetScreenHeight()/2 + 90, 250, 50 };
+    Rectangle exitButton = { GetScreenWidth()/2 - 125, GetScreenHeight()/2 + 160, 250, 50 };
 
-	// ------------ armazena as áreas dos botões ----------------
-	Rectangle playButtonArea = {(GetScreenWidth() - MeasureText("JOGAR", fontSize)) / 2, (GetScreenHeight() - fontSize) / 2 + 100, MeasureText("JOGAR", fontSize), fontSize};
-	Rectangle configButtonArea = {(GetScreenWidth() - MeasureText("CONFIGURAÇÕES", fontSize)) / 2, (GetScreenHeight() - fontSize) / 2 + 150, MeasureText("CONFIGURAÇÕES", fontSize), fontSize};
-	Rectangle devButtonArea = {(GetScreenWidth() - MeasureText("DESENVOLVEDORES", fontSize)) / 2, (GetScreenHeight() - fontSize) / 2 + 200, MeasureText("DESENVOLVEDORES", fontSize), fontSize};
-	Rectangle exitButtonArea = {(GetScreenWidth() - MeasureText("SAIR", fontSize)) / 2, (GetScreenHeight() - fontSize) / 2 + 250, MeasureText("SAIR", fontSize), fontSize};
-	Rectangle audioLeftButtonArea = {GetScreenWidth() / 2, (GetScreenHeight() - fontSize) / 2, MeasureText("<", fontSize), fontSize};
-	Rectangle audioRightButtonArea = {GetScreenWidth() / 2 + MeasureText(state->audio ? "< ON >" : "< OFF >", fontSize) - MeasureText(">", fontSize), (GetScreenHeight() - fontSize) / 2, MeasureText(">", fontSize), fontSize};
-	Rectangle backButtonArea = {(GetScreenWidth() - MeasureText("VOLTAR", fontSize)) / 2, (GetScreenHeight() - fontSize) / 2 + 250, MeasureText("VOLTAR", fontSize), fontSize};
-	
-	// armazena a posição do mouse
-	Vector2 mousePosition = GetMousePosition();
+    Vector2 mousePoint = GetMousePosition();
 
-		// ------------ atualiza a tela ----------------
-	switch (state->currentScreen){	// verifica se um dos botões foi pressionado, de acordo com a tela atual
-		case INIT:
-			if (clickedIn(playButtonArea, mousePosition)){ // se usuário apertou "JOGAR"
-				state->currentScreen = PLAY;
+    // Checa clique nos botões 
+    if (clickedIn(playButton, mousePoint)) state->currentScreen = PLAY;
+    if (clickedIn(optionsButton, mousePoint)) state->currentScreen = CONFIGURATIONS;
+    if (clickedIn(creditsButton, mousePoint)) state->currentScreen = DEVELOPERS;
+    if (clickedIn(exitButton, mousePoint)) state->exit = true;
 
-			} else if (clickedIn(configButtonArea, mousePosition)){ // se usuário apertou "CONFIGURAÇÕES"
-				state->currentScreen = CONFIGURATIONS;
+    DrawText("Coliseu", GetScreenWidth()/2 - MeasureText("Coliseu", 80)/2, 100, 80, WHITE);
+    // Botão Jogar
+    if (CheckCollisionPointRec(mousePoint, playButton)) {
+        DrawRectangleRec(playButton, WHITE); // Cor mais clara
+        DrawText("Jogar", playButton.x + 75, playButton.y + 10, 30, BLACK);
+    } else {
+        DrawRectangleRec(playButton, LIGHTGRAY);
+        DrawText("Jogar", playButton.x + 75, playButton.y + 10, 30, DARKGRAY);
+    }
 
-			} else if (clickedIn(devButtonArea, mousePosition)){ // se usuário apertou "DESENVOLVEDORES"
-				state->currentScreen = DEVELOPERS;
+    // Botão Opções
+    if (CheckCollisionPointRec(mousePoint, optionsButton)) {
+        DrawRectangleRec(optionsButton, WHITE);
+        DrawText("Opções", optionsButton.x + 65, optionsButton.y + 10, 30, BLACK);
+    } else {
+        DrawRectangleRec(optionsButton, LIGHTGRAY);
+        DrawText("Opções", optionsButton.x + 65, optionsButton.y + 10, 30, DARKGRAY);
+    }
 
-			} else if (clickedIn(exitButtonArea, mousePosition)){ // se usuário apertou "SAIR"
-				state->exit = true;
-			}
-			break;
-
-		case PLAY:
-			// adicione aqui a transição da tela de jogo para a tela de vitória/derrota
-			break;
-
-		case CONFIGURATIONS:
-			if (clickedIn(audioLeftButtonArea, mousePosition) || clickedIn(audioRightButtonArea, mousePosition)){
-				state->audio = !state->audio;
-				if (state->audio == true){
-
-					// Carrega a música nova e atualiza o estado
-    				state->music = LoadMusicStream("music/menumusic.wav");
-
-					PlayMusicStream(state->music);
-				} else{
-					StopMusicStream(state->music);
-					UnloadMusicStream(state->music);
-				}
-			} else if (clickedIn(backButtonArea, mousePosition)){ // se usuário apertou "VOLTAR"
-				state->currentScreen = INIT;
-			}
-			break;
-
-		case DEVELOPERS:
-			if (clickedIn(backButtonArea, mousePosition)){ // se usuário apertou "VOLTAR"
-				state->currentScreen = INIT;
-			}
-			break;
-		
-		default:
-			break;
-	}
+    // Botão Créditos
+    if (CheckCollisionPointRec(mousePoint, creditsButton)) {
+        DrawRectangleRec(creditsButton, WHITE);
+        DrawText("Créditos", creditsButton.x + 55, creditsButton.y + 10, 30, BLACK);
+    } else {
+        DrawRectangleRec(creditsButton, LIGHTGRAY);
+        DrawText("Créditos", creditsButton.x + 55, creditsButton.y + 10, 30, DARKGRAY);
+    }
+    
+    // Botão Sair
+    if (CheckCollisionPointRec(mousePoint, exitButton)) {
+        DrawRectangleRec(exitButton, WHITE);
+        DrawText("Sair do Jogo", exitButton.x + 30, exitButton.y + 10, 30, BLACK);
+    } else {
+        DrawRectangleRec(exitButton, LIGHTGRAY);
+        DrawText("Sair do Jogo", exitButton.x + 30, exitButton.y + 10, 30, DARKGRAY);
+    }
 }
 
-void inputAudioConfig(const int fontSize, const bool audio){
+void showConfigScreen(GameState *const state, float *volume){
+// Elementos da tela
+    Rectangle volumeSliderBar = { GetScreenWidth()/2 - 150, GetScreenHeight()/2 - 10, 300, 20 };
+    Rectangle volumeSliderHandle = { volumeSliderBar.x + (*volume * volumeSliderBar.width) - 10, GetScreenHeight()/2 - 20, 20, 40 };
+    Rectangle backButton = { GetScreenWidth()/2 - 100, GetScreenHeight()/2 + 100, 200, 50 };
+    Vector2 mousePoint = GetMousePosition();
 
-	int configOffset = 0;
+    // Lógica da barra de volume
+    if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mousePoint, volumeSliderBar))
+    {
+        // A posição do handle depende do volume recebido pelo mastervolume
+        *volume = (mousePoint.x - volumeSliderBar.x) / volumeSliderBar.width;
+        if (*volume < 0.0) *volume = 0.0;
+        if (*volume > 1.0) *volume = 1.0;
+        SetMasterVolume(*volume);
+    }
+    
+    // checa click do mouse
+    if (clickedIn(backButton, mousePoint)) state->currentScreen = INIT;
+    
+    DrawText("Opções", GetScreenWidth()/2 - MeasureText("Opções", 40)/2, 150, 40, WHITE);
+    DrawText("Volume", GetScreenWidth()/2 - MeasureText("Volume", 30)/2, GetScreenHeight()/2 - 60, 30, WHITE);
+    
+    // barra de volume
+    DrawRectangleRec(volumeSliderBar, LIGHTGRAY);
+    DrawRectangleRec(volumeSliderHandle, SKYBLUE);
+    
+    // botao voltar
+    if (CheckCollisionPointRec(mousePoint, backButton)) {
+        DrawRectangleRec(backButton, WHITE);
+        DrawText("Voltar", backButton.x + 55, backButton.y + 10, 30, BLACK);
+    } else {
+        DrawRectangleRec(backButton, LIGHTGRAY);
+        DrawText("Voltar", backButton.x + 55, backButton.y + 10, 30, DARKGRAY);
+    }
 
-	const char *configAudioName = "AUDIO ";
-	DrawText(configAudioName, GetScreenWidth() / 2 - MeasureText(configAudioName, fontSize), (GetScreenHeight() - fontSize) / 2 + configOffset, fontSize, WHITE);
-
-	if (audio == true){
-		DrawText("< ON >", GetScreenWidth() / 2, (GetScreenHeight() - fontSize) / 2 + configOffset, fontSize, WHITE);
-	} else{
-		DrawText( "< OFF >", GetScreenWidth() / 2, (GetScreenHeight() - fontSize) / 2 + configOffset, fontSize, WHITE);
-	}
 }
 
-void showInitScreen(const int fontSize){
+void showDevelopScreen(GameState *const state){
 	// tamanhos da fonte
-	int titleFontSize = fontSize + 20;
-
-	// deslocamento em relação ao centro (eixo y)
-	int titleOffset = -100;
-	int optOffset = 100;
-
-	const char *title = "UNTITLED GAME";
-	DrawText(title, (GetScreenWidth() - MeasureText(title, titleFontSize)) / 2, (GetScreenHeight() - titleFontSize) / 2 + titleOffset, titleFontSize, WHITE);
-
-	const char *const options[] = {"JOGAR", 
-					   			   "CONFIGURAÇÕES",
-					               "DESENVOLVEDORES",
-					               "SAIR"};
-	for (int i = 0; i < 4; i++){
-		DrawText(options[i], (GetScreenWidth() - MeasureText(options[i], fontSize)) / 2, (GetScreenHeight() - fontSize) / 2 + optOffset, fontSize, WHITE);
-		optOffset += 50;
-	}
-}
-
-void showConfigScreen(const int fontSize, const bool audio){
-	// tamanho da fonte para o titulo
-	int titleFontSize = fontSize + 10;
-
-	// deslocamento em relação ao centro (eixo y)
-	int titleOffset = -250;
-	int optOffset = 250;
-
-	const char *title = "CONFIGURAÇÕES";
-	DrawText(title, (GetScreenWidth() - MeasureText(title, titleFontSize)) / 2, (GetScreenHeight() - titleFontSize) / 2 + titleOffset, titleFontSize, WHITE);
-
-	inputAudioConfig(fontSize, audio);
-
-	const char *option = "VOLTAR";
-	DrawText(option, (GetScreenWidth() - MeasureText(option, fontSize)) / 2, (GetScreenHeight() - fontSize) / 2 + optOffset, fontSize, WHITE);
-}
-
-void showDevelopScreen(const int fontSize){
-	// tamanhos da fonte
-	int titleFontSize = fontSize + 10;
+	int titleFontSize = 40;
 
 	// deslocamento em relação ao centro (eixo y)
 	int titleOffset = -250;
 	int textOffset = -150;
-	int optOffset = 250;
 	
 	const char *title = "DESENVOLVEDORES";
 	DrawText(title, (GetScreenWidth() - MeasureText(title, titleFontSize)) / 2,  (GetScreenHeight() - titleFontSize) / 2 + titleOffset, titleFontSize, WHITE);
@@ -144,10 +118,85 @@ void showDevelopScreen(const int fontSize){
 						  "TITHO LÍVIO DUARTE MELO"};
 
 	for (int i = 0; i < 6; i++){
-		DrawText(developers[i], (GetScreenWidth() - MeasureText(developers[i], fontSize)) / 2,  (GetScreenHeight() - fontSize) / 2 + textOffset, fontSize, WHITE);
+		DrawText(developers[i], (GetScreenWidth() - MeasureText(developers[i], 30)) / 2,  (GetScreenHeight() - 30) / 2 + textOffset, 30, WHITE);
 		textOffset += 50;
 	}
 
-	const char *option = "VOLTAR";
-	DrawText(option, (GetScreenWidth() - MeasureText(option, fontSize)) / 2,  (GetScreenHeight() - fontSize) / 2 + optOffset, fontSize, WHITE);
+	Rectangle backButton = { GetScreenWidth()/2 - 100, GetScreenHeight() - 100, 200, 50 };
+    Vector2 mousePoint = GetMousePosition();
+
+    // checa click do mouse
+    if (clickedIn(backButton, mousePoint)) state->currentScreen = INIT;
+    
+    //botao voltar
+    if (CheckCollisionPointRec(mousePoint, backButton)) {
+        DrawRectangleRec(backButton, WHITE);
+        DrawText("Voltar", backButton.x + 55, backButton.y + 10, 30, BLACK);
+    } else {
+        DrawRectangleRec(backButton, LIGHTGRAY);
+        DrawText("Voltar", backButton.x + 55, backButton.y + 10, 30, DARKGRAY);
+    }
+
+}
+
+void showGameoverScreen(GameState *const state)
+{
+    Rectangle menuButton = { GetScreenWidth()/2 - 125, GetScreenHeight()/2 + 90, 250, 50 };
+    Rectangle exitButton = { GetScreenWidth()/2 - 125, GetScreenHeight()/2 + 160, 250, 50 };
+    Vector2 mousePoint = GetMousePosition();
+
+    // checa click do mouse
+    if (clickedIn(menuButton, mousePoint)) state->currentScreen = INIT;
+    if (clickedIn(exitButton, mousePoint)) state->exit = true;
+
+    DrawText("VOCÊ MORREU", GetScreenWidth()/2 - MeasureText("VOCÊ MORREU", 100)/2, 350, 100, RED);
+    
+    //botao voltar
+    if (CheckCollisionPointRec(mousePoint, menuButton)) {
+        DrawRectangleRec(menuButton, GRAY);
+        DrawText("Voltar ao Menu", menuButton.x + 7, menuButton.y + 10, 30, WHITE);
+    } else {
+        DrawRectangleRec(menuButton, DARKGRAY);
+        DrawText("Voltar ao Menu", menuButton.x + 7, menuButton.y + 10, 30, RED);
+    }
+    // botao sair 
+    if (CheckCollisionPointRec(mousePoint, exitButton)) {
+        DrawRectangleRec(exitButton, GRAY);
+        DrawText("Sair do Jogo", exitButton.x + 30, exitButton.y + 10, 30, WHITE);
+    } else {
+        DrawRectangleRec(exitButton, DARKGRAY);
+        DrawText("Sair do Jogo", exitButton.x + 30, exitButton.y + 10, 30, RED);
+    }
+
+}
+
+void showVictoryScreen(GameState *const state)
+{
+    Rectangle menuButton = { GetScreenWidth()/2 - 125, GetScreenHeight()/2 + 90, 250, 50 };
+    Rectangle exitButton = { GetScreenWidth()/2 - 125, GetScreenHeight()/2 + 160, 250, 50 };
+    Vector2 mousePoint = GetMousePosition();
+
+    // checa click do mouse
+    if (clickedIn(menuButton, mousePoint)) state->currentScreen = INIT;
+    if (clickedIn(exitButton, mousePoint)) state->exit = true;
+
+    DrawText("VOCÊ VENCEU", GetScreenWidth()/2 - MeasureText("VOCÊ VENCEU", 100)/2, 350, 100, GREEN);
+    
+    // botao menu
+    if (CheckCollisionPointRec(mousePoint, menuButton)) {
+        DrawRectangleRec(menuButton, WHITE);
+        DrawText("Voltar ao Menu", menuButton.x + 7, menuButton.y + 10, 30, BLACK);
+    } else {
+        DrawRectangleRec(menuButton, LIGHTGRAY);
+        DrawText("Voltar ao Menu", menuButton.x + 7, menuButton.y + 10, 30, DARKGRAY);
+    }
+    //botao sair
+    if (CheckCollisionPointRec(mousePoint, exitButton)) {
+        DrawRectangleRec(exitButton, WHITE);
+        DrawText("Sair do Jogo", exitButton.x + 30, exitButton.y + 10, 30, BLACK);
+    } else {
+        DrawRectangleRec(exitButton, LIGHTGRAY);
+        DrawText("Sair do Jogo", exitButton.x + 30, exitButton.y + 10, 30, DARKGRAY);
+    }
+
 }

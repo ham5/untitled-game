@@ -4,25 +4,25 @@
 #include "raylib.h"
 
 typedef enum{
-	INIT,
-	PLAY,
-	CONFIGURATIONS,
-	DEVELOPERS
+    INIT,
+    PLAY,
+    CONFIGURATIONS,
+    DEVELOPERS,
+    VICTORY,
+    DEFEAT,
 }GameScreen;
 
 typedef struct{
-	GameScreen currentScreen;
-	Music music;
-	bool audio;
-	int score;
-	bool exit;
+    GameScreen currentScreen;
+    int score;
+    bool exit;
 }GameState;
 
 bool clickedIn(const Rectangle ButtonArea, const Vector2 mousePosition);
-void updateGameState(GameState *const state, const int fontSize);
-void inputAudioConfig(const int fontSize, const bool audio);
-void showInitScreen(const int fontSize);
-void showConfigScreen(const int fontSize, const bool audio);
-void showDevelopScreen(const int fontSize);
+void showInitScreen(GameState *const state);
+void showConfigScreen(GameState *const state, float *volume);
+void showDevelopScreen(GameState *const state);
+void showGameoverScreen(GameState *const state);
+void showVictoryScreen(GameState *const state);
 
 #endif
