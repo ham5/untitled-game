@@ -38,12 +38,6 @@ int main (){
 
     //inicialização de variáveis do jogo
     Personagens** personagens = inicializar();
-    personagens[0][0] = criar_personagem('E', (GetScreenWidth() / 2) - 25, (GetScreenHeight() / 2) - 50, 
-                                        LoadImage("characters/Robo_Gladiador_NORTH.png"),
-                                        LoadImage("characters/Robo_Gladiador_SOUTH.png"),
-                                        LoadImage("characters/Robo_Gladiador_WEST.png"),
-                                        LoadImage("characters/Robo_Gladiador_EAST.png"), 
-                                        10, 3, 50, 50);
     int qtd_entidades[5] = {1, 0, 0, 0, 0}; //vetor que armazena a quantidade de cada tipo de personagem
 
     int stage_sequence = 0; // 0 = Primeiro estágio; 1 = Transição_Primeiro_e_Boss; 2 = Boss;
@@ -54,7 +48,7 @@ int main (){
     double gameStartTime = 0;
     bool gameplayiniciada = false;
 
-     // ===== HUD HP (PLAYER): CARREGAR UMA VEZ =====  Parte 1
+ // ===== HUD HP (PLAYER): CARREGAR UMA VEZ =====  Parte 1
     // >>> COLOQUE AQUI O CAMINHO DA PNG DO PLAYER (fill) <<<
     // Ex.: "hud/fullHPBAR.png"
     Texture2D hp_fill  = LoadTexture("hud/fullHPBAR.png");
@@ -195,6 +189,27 @@ int main (){
                     }
                     qtd_entidades[0] = 1;
                     gameplayiniciada = true;
+
+
+                    hp_fill  = LoadTexture("hud/fullHPBAR.png");
+                    hp_frame = (Texture2D){0};   // se tiver moldura, carregue e troque aqui
+                    SetTextureFilter(hp_fill, TEXTURE_FILTER_BILINEAR);
+                    if (hp_frame.id != 0) SetTextureFilter(hp_frame, TEXTURE_FILTER_BILINEAR);
+                    boss_hp_fill = LoadTexture("hud/fullBOSSHPBAR.png");
+                    boss_hp_frame = (Texture2D){0}; // opcional (moldura)
+                    SetTextureFilter(boss_hp_fill, TEXTURE_FILTER_BILINEAR);
+                    if (boss_hp_frame.id != 0) SetTextureFilter(boss_hp_frame, TEXTURE_FILTER_BILINEAR);
+                    hp_src_area   = detectar_area_hp(hp_fill);
+                    boss_src_area = detectar_area_hp(boss_hp_fill);
+
+                    hp_scale = 0.3f;   
+                    player_max_hp = personagens[0][0].HP; 
+
+
+                    boss_hp_height_scale = 0.30f;
+                    boss_hp_margin_x = 40.0f; 
+                    boss_hp_margin_bottom = 24.0f;  
+                    boss_max_hp = 0;     
                 }
 
                 //TEMPO
@@ -246,13 +261,13 @@ int main (){
             
                 
                 mover_player(personagens[0]);
-                if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && cooldown >= 60)
+                if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && cooldown >= 30)
                 {
                     cooldown = 0; // Reseta o cooldown
                     atirar(&personagens[0][0], bala_player);
                 }
             
-                if (time >= 12 && stage_sequence == 0) //!!!!!!!!!!!!!!!! BOSS_TIME
+                if (time >= 120 && stage_sequence == 0) //!!!!!!!!!!!!!!!! BOSS_TIME
                 {
                     destruir_inimigos(personagens, &qtd_entidades); //destrói os inimigos
                     stage_sequence = 1;
@@ -288,7 +303,7 @@ int main (){
                     movimentacao_boss(&personagens[4][0], &personagens[0][0], bala_inimigo, &timer, personagens, &qtd_entidades, img_N, img_A);
                     timer++;
 
-                    if (personagens[4][0].HP <= 1) { //trigger para começar a spawnar bixo
+                    if (personagens[4][0].HP <= 20) { //trigger para começar a spawnar bixo
                         if (timer % 180 == 0 && (qtd_entidades[1] + qtd_entidades[2]) < 3) { // A cada 3 segundos
                             spawnador(personagens, &qtd_entidades, img_A, img_A, img_A, img_A, 2);
                         }
@@ -329,7 +344,7 @@ int main (){
                     if (personagens[0][0].HP == 0) {
                         DrawText("MORREU ZÉ", 10, GetScreenHeight() - 50, 30, WHITE); //só p testar
                     }else {
-                        DrawText("MISSÃO: DERROTE O BOSS!", 10, GetScreenHeight() - 50, 30, WHITE);
+                        DrawText("MISSÃO: DERROTE O BOSS!", 10, GetScreenHeight() - 100, 30, WHITE);
                     }
                     desenhar_boss(&personagens[4][0]);
                     desenhar_inimigos(personagens, &qtd_entidades);
@@ -422,7 +437,6 @@ int main (){
 	}
 
 	// libera a memória
-    
     //apagando tudo relacionado ao player
 
     destruir_personagem(personagens[0][0]);

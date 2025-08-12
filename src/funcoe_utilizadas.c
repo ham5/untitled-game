@@ -34,7 +34,7 @@ Personagens criar_personagem(char sentido, float posicao_x, float posicao_y, Ima
 
 Personagens criar_boss(char sentido, float posicao_x, float posicao_y, Image imagem_N, Image imagem_S, Image imagem_W, Image imagem_E)
 {
-    Personagens BOSS = criar_personagem(sentido, posicao_x, posicao_y, imagem_N, imagem_S, imagem_W, imagem_E, 3, 1.5, 64, 64);
+    Personagens BOSS = criar_personagem(sentido, posicao_x, posicao_y, imagem_N, imagem_S, imagem_W, imagem_E, 60, 1, 64, 64);
 
     return BOSS;
 }
@@ -70,7 +70,7 @@ void movimentacao_boss(Personagens* boss, Personagens* player, Image bala_imagem
         boss->sentido = 'N';
     }
 
-    if (boss->HP == 3) //fase 1
+    if (boss->HP <= 60 && boss->HP > 40) //fase 1
     {
         // movimentação do boss
         if (*timer % 60 == 0) { //1 tiro por segundo
@@ -78,12 +78,13 @@ void movimentacao_boss(Personagens* boss, Personagens* player, Image bala_imagem
         }
     }
 
-    if (boss->HP <= 2) { //fase 2
+    if (boss->HP <= 40) //fase 2
+    {
         boss->speed = 1;
         if (*timer % 20 == 0) { //3 tiros por segundo
             atirar_dir_player(boss, player, bala_imagem);
         }
-        if (*timer % 60 == 0) {
+        if (*timer % 180 == 0) {
             for (int i = 0; i < 360; i += 30) { //tiro pra todos os lados
                 float dir_x = cosf(i * (PI / 180.0f));
                 float dir_y = sinf(i * (PI / 180.0f));
@@ -636,9 +637,12 @@ void destruir_inimigos(Personagens** entidades, int (*qtd_entidades)[5]) {
     }
 }
 
-void destruir_inimigos_e_boss(Personagens** entidades, int (*qtd_entidades)[5]) {
-    for (int i = 1; i < 5; i++) {
-        for (int j = 0; j < (*qtd_entidades)[i]; j++) {
+void destruir_inimigos_e_boss(Personagens** entidades, int (*qtd_entidades)[5]) 
+{
+    for (int i = 1; i < 5; i++) 
+    {
+        for (int j = 0; j < (*qtd_entidades)[i]; j++) 
+        {
             destruir_personagem(entidades[i][j]);
         }
         free(entidades[i]);

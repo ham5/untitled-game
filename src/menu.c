@@ -1,5 +1,6 @@
 #include "raylib.h"
 #include "menu.h"
+#include <stdio.h>
 
 bool clickedIn(Rectangle ButtonArea, Vector2 mousePosition){
 	if (CheckCollisionPointRec(mousePosition, ButtonArea) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
@@ -180,6 +181,9 @@ void showGameoverScreen(GameState *state)
     if (clickedIn(menuButton, mousePoint)) state->currentScreen = INIT;
     if (clickedIn(exitButton, mousePoint)) state->exit = true;
 
+    char scoreText[20];
+    sprintf(scoreText, "Score: %d", state->score);
+    DrawText(scoreText, GetScreenWidth()/2 - MeasureText(scoreText, 25)/2, 470, 25, WHITE);
     DrawText("VOCÊ MORREU", GetScreenWidth()/2 - MeasureText("VOCÊ MORREU", 100)/2, 350, 100, RED);
     
     //botao voltar
@@ -213,9 +217,9 @@ void showVictoryScreen(GameState *state)
     if (clickedIn(menuButton, mousePoint)) state->currentScreen = INIT;
     if (clickedIn(exitButton, mousePoint)) state->exit = true;
 
-    state->score 
-    DrawText(state->score, GetScreenWidth()/2 - MeasureText("VOCÊ VENCEU", 100)/2, 350, 100, WHITE);
-    DrawText(state->score, GetScreenWidth()/2 - MeasureText("VOCÊ VENCEU", 100)/2, 350, 100, WHITE);
+    char scoreText[20];
+    sprintf(scoreText, "Score: %d", state->score);
+    DrawText(scoreText, GetScreenWidth()/2 - MeasureText(scoreText, 25)/2, 470, 25, WHITE); 
     DrawText("VOCÊ VENCEU", GetScreenWidth()/2 - MeasureText("VOCÊ VENCEU", 100)/2, 350, 100, GREEN);
     
     // botao menu
