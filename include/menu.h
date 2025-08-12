@@ -8,6 +8,7 @@ typedef enum{
     PLAY,
     CONFIGURATIONS,
     DEVELOPERS,
+    LORE,
     VICTORY,
     DEFEAT,
 }GameScreen;
@@ -18,11 +19,12 @@ typedef struct{
     bool exit;
 }GameState;
 
-bool clickedIn(const Rectangle ButtonArea, const Vector2 mousePosition);
-void showInitScreen(GameState *const state);
-void showConfigScreen(GameState *const state, float *volume);
-void showDevelopScreen(GameState *const state);
-void showGameoverScreen(GameState *const state);
-void showVictoryScreen(GameState *const state);
+bool clickedIn(Rectangle ButtonArea, Vector2 mousePosition);
+void showInitScreen(GameState *state);
+void showConfigScreen(GameState *state, float *volume);
+void showDevelopScreen(GameState *state);
+void showGameoverScreen(GameState *state);
+void showVictoryScreen(GameState *state);
+void showLoreScreen(GameState *state);
 
 #endif

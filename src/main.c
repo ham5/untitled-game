@@ -93,9 +93,9 @@ int main (){
 
     // HUD do Boss (parâmetros)
     float boss_hp_height_scale = 0.30f;  // altura relativa à área útil original
-    float boss_hp_margin_x     = 40.0f;  // margens laterais
-    float boss_hp_margin_bottom= 24.0f;  // margem inferior (distância do rodapé)
-    int   boss_max_hp          = 0;      // define quando o boss nasce
+    float boss_hp_margin_x = 40.0f;  // margens laterais
+    float boss_hp_margin_bottom = 24.0f;  // margem inferior (distância do rodapé)
+    int   boss_max_hp = 0;      // define quando o boss nasce
     //============================================================
 
     Vector2 middle_circle;
@@ -104,6 +104,7 @@ int main (){
     Texture2D background = criar_background("background/menu.png");
     Texture2D arena_jogo = criar_background("background/Arena.png");
     Texture2D arena_boss = criar_background("background/Sala_Boss.png");
+    Texture2D lorebackground = criar_background("background/sobra_ou_nao_sobra.png");
     Texture2D vitoriabackground = criar_background("background/vitoria.png");
     Texture2D derrotainimigosbackground = criar_background("background/sobrou_nada.png");
     Texture2D derrotabossbackground = criar_background("background/soubrou_absolutamente_nada.png");
@@ -188,11 +189,11 @@ int main (){
                                         LoadImage("characters/Robo_Gladiador_EAST.png"), 
                                         10, 3, 50, 50);
                     
-                    for (int i = 0; i < 5; i++)
+                    for (int i = 1; i < 5; i++)
                     {
                         qtd_entidades[i] = 0; // zera a contagem de todos os personagens
                     }
-                    
+                    qtd_entidades[0] = 1;
                     gameplayiniciada = true;
                 }
 
@@ -349,7 +350,6 @@ int main (){
                 }
                 
 
-
                 //============================================================ HUD
                 // ===== HUD: BARRA DE HP (PLAYER) =====
                 desenhar_barra_hp(&personagens[0][0], player_max_hp,
@@ -385,17 +385,20 @@ int main (){
                 gameStartTime = 0;
                 state.score = 0;
                 break;
-            
+            case LORE:
+                alternador = lorebackground;
+                showLoreScreen(&state);
+                gameStartTime = 0;
+                state.score = 0;
+                break;
             case VICTORY:
                 if(IsMusicStreamPlaying(bossmusic)){
                     StopMusicStream(bossmusic);
                     PlayMusicStream(victorymusic);
                 } 
-
-                alternador = vitoriabackground;
                 showVictoryScreen(&state);
                 gameStartTime = 0;
-                state.score = 0;
+                
 			    break;
 		    case DEFEAT:
                 if(IsMusicStreamPlaying(bossmusic)) StopMusicStream(bossmusic);
@@ -409,7 +412,7 @@ int main (){
 
                 showGameoverScreen(&state);
                 gameStartTime = 0;
-                state.score = 0;
+                
 			    break;
             default:
                 break;
@@ -419,6 +422,62 @@ int main (){
 	}
 
 	// libera a memória
+    
+    //apagando tudo relacionado ao player
+
+    destruir_personagem(personagens[0][0]);
+    UnloadImage(bala_player);
+    //apagando tudo relacionado ao boss
+    if(stage_sequence==2){
+        destruir_personagem(personagens[4][0]);
+        UnloadImage(bala_inimigo);
+        UnloadTexture(arena_boss);
+       
+    }
+ 
+    //apagando inimigos
+   
+    for (int i = 0; i < qtd_entidades[1]; i++) {
+        destruir_personagem(personagens[1][i]);
+        
+    }
+    for (int i = 0; i < qtd_entidades[2]; i++) {
+        destruir_personagem(personagens[2][i]);
+        
+    }
+    for (int i = 0; i < qtd_entidades[3]; i++) {
+        destruir_personagem(personagens[3][i]);
+        
+    }
+
+
+    for (int i = 1; i < 4; i++) {
+        if (personagens[i]){
+            free(personagens[i]);
+        }
+    }
+
+    
+
+
+    //liberando a matriz de personagens    
+    free(personagens);
+    
+    //apagando musicas
+    UnloadMusicStream(bossmusic);
+    UnloadMusicStream(salainimigo);
+    UnloadMusicStream(menumusic);
+    UnloadMusicStream(victorymusic);
+    
+    //apagando imagens de background
+    UnloadTexture(background);
+    UnloadTexture(arena_jogo);
+    UnloadTexture(vitoriabackground);
+    UnloadTexture(derrotainimigosbackground);
+    UnloadTexture(derrotabossbackground);
+    
+
+    UnloadTexture(lorebackground);
 
     //============================================================
     // HUDs 

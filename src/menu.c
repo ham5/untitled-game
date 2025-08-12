@@ -1,19 +1,21 @@
 #include "raylib.h"
 #include "menu.h"
 
-bool clickedIn(const Rectangle ButtonArea, const Vector2 mousePosition){
+bool clickedIn(Rectangle ButtonArea, Vector2 mousePosition){
 	if (CheckCollisionPointRec(mousePosition, ButtonArea) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
 		return true;
 	}
 	return false;
 }
 
-void showInitScreen(GameState *const state){
+void showInitScreen(GameState *state){
 	// Áreas base dos botões
     Rectangle playButton = { GetScreenWidth()/2 - 125, GetScreenHeight()/2 - 50, 250, 50 };
     Rectangle optionsButton = { GetScreenWidth()/2 - 125, GetScreenHeight()/2 + 20, 250, 50 };
     Rectangle creditsButton = { GetScreenWidth()/2 - 125, GetScreenHeight()/2 + 90, 250, 50 };
-    Rectangle exitButton = { GetScreenWidth()/2 - 125, GetScreenHeight()/2 + 160, 250, 50 };
+    Rectangle LoreButton = { GetScreenWidth()/2 - 125, GetScreenHeight()/2 + 160, 250, 50 };
+    Rectangle exitButton = { GetScreenWidth()/2 - 125, GetScreenHeight()/2 + 230, 250, 50 };
+    
 
     Vector2 mousePoint = GetMousePosition();
 
@@ -21,12 +23,13 @@ void showInitScreen(GameState *const state){
     if (clickedIn(playButton, mousePoint)) state->currentScreen = PLAY;
     if (clickedIn(optionsButton, mousePoint)) state->currentScreen = CONFIGURATIONS;
     if (clickedIn(creditsButton, mousePoint)) state->currentScreen = DEVELOPERS;
+    if (clickedIn(LoreButton, mousePoint)) state->currentScreen = LORE;
     if (clickedIn(exitButton, mousePoint)) state->exit = true;
 
     DrawText("Coliseu", GetScreenWidth()/2 - MeasureText("Coliseu", 80)/2, 100, 80, WHITE);
     // Botão Jogar
     if (CheckCollisionPointRec(mousePoint, playButton)) {
-        DrawRectangleRec(playButton, WHITE); // Cor mais clara
+        DrawRectangleRec(playButton, WHITE);
         DrawText("Jogar", playButton.x + 75, playButton.y + 10, 30, BLACK);
     } else {
         DrawRectangleRec(playButton, LIGHTGRAY);
@@ -50,7 +53,16 @@ void showInitScreen(GameState *const state){
         DrawRectangleRec(creditsButton, LIGHTGRAY);
         DrawText("Créditos", creditsButton.x + 55, creditsButton.y + 10, 30, DARKGRAY);
     }
-    
+
+    // Botão Lore
+    if (CheckCollisionPointRec(mousePoint, LoreButton)) {   
+        DrawRectangleRec(LoreButton, WHITE);
+        DrawText("Lore", LoreButton.x + 85, LoreButton.y + 10, 30, BLACK);
+    } else {
+        DrawRectangleRec(LoreButton, LIGHTGRAY);
+        DrawText("Lore", LoreButton.x + 85, LoreButton.y + 10, 30, DARKGRAY);
+    }
+
     // Botão Sair
     if (CheckCollisionPointRec(mousePoint, exitButton)) {
         DrawRectangleRec(exitButton, WHITE);
@@ -61,7 +73,7 @@ void showInitScreen(GameState *const state){
     }
 }
 
-void showConfigScreen(GameState *const state, float *volume){
+void showConfigScreen(GameState *state, float *volume){
 // Elementos da tela
     Rectangle volumeSliderBar = { GetScreenWidth()/2 - 150, GetScreenHeight()/2 - 10, 300, 20 };
     Rectangle volumeSliderHandle = { volumeSliderBar.x + (*volume * volumeSliderBar.width) - 10, GetScreenHeight()/2 - 20, 20, 40 };
@@ -99,7 +111,7 @@ void showConfigScreen(GameState *const state, float *volume){
 
 }
 
-void showDevelopScreen(GameState *const state){
+void showDevelopScreen(GameState *state){
 	// tamanhos da fonte
 	int titleFontSize = 40;
 
@@ -107,7 +119,7 @@ void showDevelopScreen(GameState *const state){
 	int titleOffset = -250;
 	int textOffset = -150;
 	
-	const char *title = "DESENVOLVEDORES";
+	char *title = "DESENVOLVEDORES";
 	DrawText(title, (GetScreenWidth() - MeasureText(title, titleFontSize)) / 2,  (GetScreenHeight() - titleFontSize) / 2 + titleOffset, titleFontSize, WHITE);
 
 	char *developers[] = {"EDIVALDO AMBROZIO DA SILVA FILHO",
@@ -139,7 +151,26 @@ void showDevelopScreen(GameState *const state){
 
 }
 
-void showGameoverScreen(GameState *const state)
+void showLoreScreen(GameState *state){
+
+	Rectangle backButton = { GetScreenWidth()/2 - 100, GetScreenHeight() - 100, 200, 50 };
+    Vector2 mousePoint = GetMousePosition();
+
+    // checa click do mouse
+    if (clickedIn(backButton, mousePoint)) state->currentScreen = INIT;
+    
+    //botao voltar
+    if (CheckCollisionPointRec(mousePoint, backButton)) {
+        DrawRectangleRec(backButton, WHITE);
+        DrawText("Voltar", backButton.x + 55, backButton.y + 10, 30, BLACK);
+    } else {
+        DrawRectangleRec(backButton, LIGHTGRAY);
+        DrawText("Voltar", backButton.x + 55, backButton.y + 10, 30, DARKGRAY);
+    }
+
+}
+
+void showGameoverScreen(GameState *state)
 {
     Rectangle menuButton = { GetScreenWidth()/2 - 125, GetScreenHeight()/2 + 90, 250, 50 };
     Rectangle exitButton = { GetScreenWidth()/2 - 125, GetScreenHeight()/2 + 160, 250, 50 };
@@ -170,16 +201,21 @@ void showGameoverScreen(GameState *const state)
 
 }
 
-void showVictoryScreen(GameState *const state)
+void showVictoryScreen(GameState *state)
 {
     Rectangle menuButton = { GetScreenWidth()/2 - 125, GetScreenHeight()/2 + 90, 250, 50 };
     Rectangle exitButton = { GetScreenWidth()/2 - 125, GetScreenHeight()/2 + 160, 250, 50 };
     Vector2 mousePoint = GetMousePosition();
 
+
+
     // checa click do mouse
     if (clickedIn(menuButton, mousePoint)) state->currentScreen = INIT;
     if (clickedIn(exitButton, mousePoint)) state->exit = true;
 
+    state->score 
+    DrawText(state->score, GetScreenWidth()/2 - MeasureText("VOCÊ VENCEU", 100)/2, 350, 100, WHITE);
+    DrawText(state->score, GetScreenWidth()/2 - MeasureText("VOCÊ VENCEU", 100)/2, 350, 100, WHITE);
     DrawText("VOCÊ VENCEU", GetScreenWidth()/2 - MeasureText("VOCÊ VENCEU", 100)/2, 350, 100, GREEN);
     
     // botao menu

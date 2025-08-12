@@ -2,7 +2,7 @@
 #include "menu.h"
 #include <math.h>
 
-//Cria um personagem e atribui suas caracteristicas
+//Cria um personagem e atribui suas caracteristicas 
 Personagens criar_personagem(char sentido, float posicao_x, float posicao_y, Image imagem_N, Image imagem_S, Image imagem_W, Image imagem_E, int HP, int speed, int tamanho, int largura)
 {
     Personagens novo_personagem;
