@@ -1,44 +1,42 @@
-## $(Game Title)
+## Coliseu
 
-![$(Game Title)](screenshots/screenshot000.png "$(Game Title)")
+![$Coliseu](screenshots/screenshot000.png "Coliseu")
 
 ### Description
 
-$(Your Game Description)
+Coliseu é um intenso jogo de arena no estilo "bullet hell" onde você controla um Robô Gladiador em um combate mortal pela sobrevivência. O desafio é dividido em duas fases eletrizantes: primeiro, sobreviva por dois minutos contra hordas de inimigos implacáveis em uma arena. Em seguida, se for forte o suficiente, entre no portal para enfrentar o temível Boss em uma batalha final épica. Use seus reflexos, atire sem parar e prove seu valor no Coliseu!
 
 ### Features
 
- - $(Game Feature 01)
- - $(Game Feature 02)
- - $(Game Feature 03)
+ - Sobrevivência Frenética: Enfrente ondas de inimigos com diferentes padrões de ataque e sobreviva por 2 minutos para provar seu valor.
+ - Batalha de Chefe Épica: Após o tempo, um portal se abre para a sala do Boss. Derrote um chefe poderoso com múltiplos padrões de ataque que se intensificam conforme sua  vida diminui.
+ - Movimentação e Disparos: Controle seu gladiador robótico com precisão e use disparos para eliminar os inimigos e o chefe final.
 
 ### Controls
 
 Keyboard:
- - $(Game Control 01)
- - $(Game Control 02)
- - $(Game Control 03)
+ - ARROW KEY UP: MOVER PARA CIMA
+ - ARROW KEY DOWN: MOVER PARA BAIXO
+ - ARROW KEY LEFT: MOVER PARA A ESQUERDA
+ - ARROW KEY RIGHT: MOVER PARA DIREITA
+Mouse:
+ - BOTÃO ESQUERDO: Atirar
 
 ### Screenshots
 
-_TODO: Show your game to the world, animated GIFs recommended!._
+![$Coliseu](screenshots/menu.png "Coliseu")
+![$Coliseu](screenshots/enemyroom.png "Coliseu")
+![$Coliseu](screenshots/bossroom.png "Coliseu")
+![$Coliseu](screenshots/gameover.png "Coliseu")
 
 ### Developers
 
- - $(Developer 01) - $(Role/Tasks Developed)
+ - Titho Lívio - Estrura base do jogo (Struct personagens, movimentação do player, transição de fases (portal), Score), e os sprites (Player, Inimigos, Boss, e balas)
  - $(Developer 02) - $(Role/Tasks Developed)
  - $(Developer 03) - $(Role/Tasks Developed)
 
-### Links
-
- - YouTube Gameplay: $(YouTube Link)
- - itch.io Release: $(itch.io Game Page)
- - Steam Release: $(Steam Game Page)
 
 ### License
 
 This game sources are licensed under an unmodified zlib/libpng license, which is an OSI-certified, BSD-like license that allows static linking with closed source software. Check [LICENSE](LICENSE) for further details.
 
-$(Additional Licenses)
-
-*Copyright (c) $(Year) $(User Name) ($(User Twitter/GitHub Name))*
