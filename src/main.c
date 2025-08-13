@@ -1,5 +1,5 @@
 #include "raylib.h"
-#include "resource_dir.h"  // biblioteca auxiliar criada para para garantir que arquivos como imagens, sons e fontes possam ser carregados corretamente, mesmo que o executável esteja em outro diretório
+#include "resource_dir.h"
 #include "HUD_e_background.h" 
 #include "boss.h"
 #include "MC_e_personagens.h"
@@ -44,7 +44,7 @@ int main (){
 
     int fontSize = 30; // usado para textos (não aparece explicitamente em todo lugar)
 
-    // Toca música de menu no começo
+    // toca música de menu no começo
     PlayMusicStream(menumusic);
 
     // ===== inicialização de variáveis de jogo =====
@@ -167,15 +167,10 @@ int main (){
 
             case PLAY: // rodar o jogo aqui (chamar a função para rodar o jogo)
 
-                //============================================================ HUD
+                //=======================HUD=================================
                 // posicionamento automático da barra de HP do player (auto-centraliza se x = -1)
                 hp_pos.x = -1.0f;   // auto-centraliza dentro da função
                 hp_pos.y = 30.0f;   // altura desejada
-
-                // HP máximo do player = HP inicial (já definido antes)
-
-                // zera max HP do boss; vai ser setado quando nascer
-                // boss_max_hp = 0;
                 //============================================================
 
                 // inicialização da jogabilidade (executada apenas uma vez por rodada)
@@ -200,7 +195,7 @@ int main (){
                     {
                         qtd_entidades[i] = 0; // zera a contagem de todos os personagens
                     }
-                    qtd_entidades[0] = 1; // conta do player
+                    qtd_entidades[0] = 1; // player
                     gameplayiniciada = true;
 
                     // recarrega as texturas de HUD (padrão)
@@ -243,7 +238,7 @@ int main (){
                     int time_spawn = 2; // intervalo de spawn em segundos
 
                     // lógica para spawnar apenas uma vez por segundo (evita múltiplos spawns no mesmo segundo)
-                    if(((int)time % time_spawn == 0) && (time > 0) && (((int)time != ((int)(time - GetFrameTime()))))) // Evita spawns múltiplos no mesmo segundo
+                    if(((int)time % time_spawn == 0) && (time > 0) && (((int)time != ((int)(time - GetFrameTime())))))
                     {
                         if (qtd_entidades[1] + qtd_entidades[2] < 8)
                         {
@@ -258,11 +253,11 @@ int main (){
                 }
 
                 // move inimigos do tipo corredor
-                for(int i = 0;i<qtd_entidades[1];i++){ // move o inimigo corredor
+                for(int i = 0;i<qtd_entidades[1];i++){ 
                     mover_inimigo(&personagens[1][i], &personagens[0][0]);
                 }
                 // move inimigos do tipo atirador
-                for(int i = 0;i<qtd_entidades[2];i++){ // move o inimigo atirador
+                for(int i = 0;i<qtd_entidades[2];i++){
                     mover_atirador(&personagens[2][i]);
                 }
 
@@ -290,7 +285,7 @@ int main (){
                 }
 
                 // transição para o evento do boss (após 120s)
-                if (time >= 120 && stage_sequence == 0) // !!!!!!!!!! BOSS_TIME
+                if (time >= 120 && stage_sequence == 0)
                 {
                     destruir_inimigos(personagens, &qtd_entidades); // destrói os inimigos
                     stage_sequence = 1; // entra na sequência de transição
@@ -302,7 +297,6 @@ int main (){
                 // se o jogador entrar no círculo do portal, inicia o boss
                 if (stage_sequence == 1 && CheckCollisionCircleRec(middle_circle, 30, personagens[0][0].hitbox))
                 {
-                    // lembrar de limpar todos os inimigos da tela (já feito anteriormente)
                     PlayMusicStream(bossmusic);
                     stage_sequence = 2; // entra no estágio do boss
                     alternador = arena_boss;
@@ -396,7 +390,7 @@ int main (){
                 }
                 
 
-                //============================================================ HUD
+                //============================================================
                 // ===== HUD: BARRA DE HP (PLAYER) =====
                 desenhar_barra_hp(&personagens[0][0], player_max_hp,
                 hp_fill, hp_frame, hp_pos, hp_scale,
@@ -499,3 +493,4 @@ int main (){
 
 	return 0;
 }
+
