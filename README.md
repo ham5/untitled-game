@@ -34,6 +34,7 @@ Mouse:
  - Titho Lívio - Estrutura base do jogo (Struct personagens, movimentação do player, transição de fases (portal), Score), e os sprites (Player, Inimigos, Boss, e balas) (づ｡◕‿‿◕｡)づ
  - Guilherme Fabri - Construção do combate em geral (geração, movimentação e colisão das balas das entidades, e design do Boss)
  - Heitor Machado - Construção do menu e navegação (opções do menu, transição de telas e configuração de áudio)
+ - Lucas Mendes - Implementação em código da HUD e design artístico das barras de vidas (Player e Boss), refinamento dos controles de movimentação, e supervisão da integração de branches
  - $(Developer 04) - $(Role/Tasks Developed)
 
 
