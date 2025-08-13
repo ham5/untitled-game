@@ -31,8 +31,8 @@ Mouse:
 
 ### Developers
 
- - Titho Lívio - Estrura base do jogo (Struct personagens, movimentação do player, transição de fases (portal), Score), e os sprites (Player, Inimigos, Boss, e balas)
- - $(Developer 02) - $(Role/Tasks Developed)
+ - Titho Lívio - Estrura base do jogo (Struct personagens, movimentação do player, transição de fases (portal), Score), e os sprites (Player, Inimigos, Boss, e balas) (づ｡◕‿‿◕｡)づ
+ - Guilherme Fabri - Construção do combate em geral (geração, movimentação e colisão das balas das entidades, e design do Boss)
  - $(Developer 03) - $(Role/Tasks Developed)
 
 
